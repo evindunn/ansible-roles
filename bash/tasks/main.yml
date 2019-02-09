@@ -1,0 +1,8 @@
+---
+
+- name: configure bash defaults
+  lineinfile:
+    line: "{{ item }}"
+    path: /etc/bash.bashrc
+    create: yes
+  loop: "{{ bash_opts }}"

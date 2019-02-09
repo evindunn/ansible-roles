@@ -1,0 +1,10 @@
+---
+
+- name: add the docker gpg key
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+
+- name: add the docker repo
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable
+    update_cache: yes

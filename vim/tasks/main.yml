@@ -1,0 +1,15 @@
+---
+
+- name: include os-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: install packages
+  package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ pkgs }}"
+
+- name: configure vim global defaults
+  copy:
+    src: vimrc.local
+    dest: /etc/vim/

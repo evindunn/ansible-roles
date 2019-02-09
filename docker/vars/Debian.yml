@@ -1,0 +1,11 @@
+---
+
+deps:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg2
+  - software-properties-common
+
+pkgs:
+  - docker-ce
