@@ -1,0 +1,10 @@
+---
+
+- name: add the kubernetes gpg key
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+- name: add the kubernetes repo
+  apt_repository:
+    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+    update_cache: yes

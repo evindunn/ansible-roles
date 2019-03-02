@@ -1,0 +1,12 @@
+---
+
+- name: enable/restart kubernetes
+  systemd:
+    service: kubelet
+    state: restarted
+    enabled: yes
+
+- name: restart docker
+  systemd:
+    service: docker
+    state: restarted

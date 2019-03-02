@@ -1,0 +1,6 @@
+---
+
+pkgs:
+  - kubeadm
+  - kubectl
+  - kubelet

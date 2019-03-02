@@ -1,0 +1,28 @@
+---
+
+- name: disable swap
+  shell: swapoff -a
+
+- name: remove swap from fstab
+  lineinfile:
+    regexp: .*swap.*
+    state: absent
+
+- name: configure mount propagation in docker
+  blockinfile:
+    block: |
+      [Service]
+      MountFlags=shared
+    path: /etc/systemd/system/docker.service.d/mount-flags.conf
+    create: yes
+  notify: restart docker
+
+- name: include os-specific tasks
+  include_tasks: "{{ ansible_os_family }}.yml"
+
+- name: install kubernetes
+  package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ pkgs }}"
+  notify: enable/restart kubernetes
