@@ -1,0 +1,5 @@
+---
+
+bash_opts:
+  - alias ls='ls -h'
+  - alias ll='ls -l'
