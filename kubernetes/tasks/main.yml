@@ -12,6 +12,7 @@
 - name: remove swap from fstab
   lineinfile:
     regexp: .*swap.*
+    path: /etc/fstab
     state: absent
 
 - name: configure mount propagation in docker
