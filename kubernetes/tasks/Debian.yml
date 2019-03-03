@@ -1,5 +1,11 @@
 ---
 
+- name: install dependencies
+  package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ deps }}"
+
 - name: add the kubernetes gpg key
   apt_key:
     url: https://packages.cloud.google.com/apt/doc/apt-key.gpg

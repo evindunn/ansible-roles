@@ -1,5 +1,11 @@
 ---
 
+- name: include os-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: include os-specific tasks
+  include_tasks: "{{ ansible_os_family }}.yml"
+
 - name: disable swap
   shell: swapoff -a
 
@@ -16,9 +22,6 @@
     path: /etc/systemd/system/docker.service.d/mount-flags.conf
     create: yes
   notify: restart docker
-
-- name: include os-specific tasks
-  include_tasks: "{{ ansible_os_family }}.yml"
 
 - name: install kubernetes
   package:
