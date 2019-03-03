@@ -37,5 +37,6 @@
 # Required for flannel
 - name: pass bridged traffic to iptables
   sysctl:
-    name: sysctl net.bridge.bridge-nf-call-iptables
+    name: net.bridge.bridge-nf-call-iptables
     value: 1
+    sysctl_set: yes
