@@ -1,7 +1,7 @@
 ---
 
 - name: include os-specific variables
-  include_vars: "{{ item }}" 
+  include_vars: "{{ item }}"
   loop:
     - main.yml
     - "{{ ansible_os_family }}.yml"
@@ -33,3 +33,9 @@
     state: present
   loop: "{{ pkgs }}"
   notify: enable/restart kubernetes
+
+# Required for flannel
+- name: pass bridged traffic to iptables
+  sysctl:
+    name: sysctl net.bridge.bridge-nf-call-iptables
+    value: 1
