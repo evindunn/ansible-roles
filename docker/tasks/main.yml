@@ -12,11 +12,17 @@
     state: present
   loop: "{{ deps }}"
 
+- name: install docker
+  executable: /bin/bash
+  shell: curl -fsSL get.docker.com | sh
+
 - name: include os-specific tasks
   include_tasks: "{{ ansible_os_family }}.yml"
 
-- name: install docker
-  package:
-    name: "{{ item }}"
-    state: present
-  loop: "{{ pkgs }}"
+- name: enable the docker daemon
+  systemd:
+    name: docker
+    enabled: yes
+    state: restarted
+
+

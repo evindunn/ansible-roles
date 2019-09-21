@@ -1,0 +1,8 @@
+---
+
+- name: upgrade packages
+  yum:
+    name: '*'
+    state: latest
+    update_cache: yes
+    autoremove: yes

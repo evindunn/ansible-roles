@@ -1,0 +1,7 @@
+---
+
+- name: update packages
+  apt:
+    upgrade: dist
+    autoremove: yes
+    update_cache: yes
