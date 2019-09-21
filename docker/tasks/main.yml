@@ -12,10 +12,17 @@
     state: present
   loop: "{{ deps }}"
 
+- name: check if docker is installed
+  shell: which docker
+  register: docker_installed
+  changed_when: False
+  failed_when: False
+
 - name: install docker
   shell: curl -fsSL get.docker.com | sh
   args:
     executable: /bin/bash
+  when: docker_installed.rc != 0
 
 - name: include os-specific tasks
   include_tasks: "{{ ansible_os_family }}.yml"
