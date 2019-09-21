@@ -28,7 +28,7 @@
   include_tasks: "{{ ansible_os_family }}.yml"
 
 - name: enable the docker daemon
-  systemd:
+  service:
     name: docker
     enabled: yes
     state: started
