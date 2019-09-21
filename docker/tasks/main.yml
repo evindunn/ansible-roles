@@ -13,8 +13,9 @@
   loop: "{{ deps }}"
 
 - name: install docker
-  executable: /bin/bash
   shell: curl -fsSL get.docker.com | sh
+  args:
+    executable: /bin/bash
 
 - name: include os-specific tasks
   include_tasks: "{{ ansible_os_family }}.yml"
