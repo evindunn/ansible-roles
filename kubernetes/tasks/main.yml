@@ -1,15 +1,11 @@
 ---
 
-- name: include os-specific variables
-  include_vars: "{{ item }}"
-  loop:
-    - main.yml
-    - "{{ ansible_os_family }}.yml"
-
 - name: make sure docker is installed
   include_role:
     name: docker
   vars:
+    pkgs:
+      - docker-ce
     docker_daemon_opts:
       userns-remap: default
       storage-driver: overlay2
@@ -18,6 +14,12 @@
       log-driver: json-file
       log-opts:
         max-size: 100m  
+
+- name: include os-specific variables
+  include_vars: "{{ item }}"
+  loop:
+    - main.yml
+    - "{{ ansible_os_family }}.yml"
 
 - name: include os-specific tasks
   include_tasks: "{{ ansible_os_family }}.yml"
