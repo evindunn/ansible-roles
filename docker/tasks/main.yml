@@ -27,6 +27,13 @@
 - name: include os-specific tasks
   include_tasks: "{{ ansible_os_family }}.yml"
 
+- name: configure the docker daemon
+  template:
+    src: docker.daemon.json.j2
+    dest: /etc/docker/daemon.json
+    mode: '0644'
+  notify: enable/restart docker
+
 - name: enable the docker daemon
   service:
     name: docker
