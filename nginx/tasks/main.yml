@@ -1,0 +1,38 @@
+- name: install packages
+  package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ pkgs }}"
+  notify: enable/start nginx
+
+- name: clean current config
+  file:
+    path: "{{ item }}/"
+    state: absent
+  loop:
+    - /etc/nginx/conf.d
+    - /etc/nginx/streams-enabled
+    - /etc/nginx/sites-enabled
+
+- name: configure nginx.conf
+  copy:
+    src: nginx.conf
+    dest: /etc/nginx/
+  notify: enable/start nginx
+
+- name: configure /etc/nginx/conf.d
+  copy:
+    src: conf.d
+    dest: /etc/nginx
+  notify: enable/start nginx
+
+- name: make sure site directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - /etc/nginx/streams-enabled
+    - /etc/nginx/sites-enabled
+    - /etc/nginx/streams-available
+    - /etc/nginx/sites-available
+
