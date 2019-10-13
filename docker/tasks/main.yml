@@ -24,9 +24,6 @@
     executable: /bin/bash
   when: docker_installed.rc != 0
 
-- name: include os-specific tasks
-  include_tasks: "{{ ansible_os_family }}.yml"
-
 - name: configure the docker daemon
   template:
     src: docker.daemon.json.j2
