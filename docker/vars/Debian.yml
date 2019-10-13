@@ -6,4 +6,5 @@ deps:
   - curl
   - gnupg2
   - software-properties-common
+  - uidmap
 
