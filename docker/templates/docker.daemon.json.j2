@@ -1,1 +1,5 @@
-{{ docker_daemon_opts | to_json }}
+{% if docker_daemon_opts is defined %}
+  {{ docker_daemon_opts | to_json }}
+{% else %}
+{}
+{% endif %}
