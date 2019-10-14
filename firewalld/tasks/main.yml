@@ -37,7 +37,7 @@
     permanent: true
   loop: "{{ firewalld_opts.zones | map(attribute='name') | list }}"
 
-- name: get the current default zone
+- name: get the default zone
   shell: "firewall-cmd --get-default-zone"
   register: firewalld_current_zone
   changed_when: False
@@ -53,38 +53,27 @@
  
 - name: determine zone targets
   shell: "firewall-cmd --permanent --get-target --zone={{ item.name }}"
-  register: item.current_target
+  register: current_targets
   loop: "{{ firewalld_opts.zones }}"
   changed_when: False
 
-- name: debug
-  debug:
-    msg: "{{ item }}"
+- name: update zone targets
+  shell: "firewall-cmd --permanent --set-target={{ item.item.target | default('DROP') }} --zone={{ item.item.name }}"
+  when: item.item.target is defined and item.stdout.strip() != item.item.target
+  loop: "{{ current_targets.results }}"
+
+- name: get the current enabled services
+  shell: "firewall-cmd --list-services --zone={{ item.name }}"
+  register: current_services
   loop: "{{ firewalld_opts.zones }}"
+  changed_when: False
 
-  # - name: update zone targets
-  #   shell: "firewall-cmd --permanent --set-target={{ item.target }} --zone={{ item.name }}"
-  #   when: item.current_target.stdout.strip() != item.target
-  #   loop: "{{ firewalld_opts.zones }}"
+- name: get the current enabled services
+  set_fact: 
+    tmp_list: "{{ tmp_list | default([]) + [{ 'zone': item.item.name, 'services': item.stdout.split(' ') }] }}"
+  loop: "{{ current_services.results }}"
 
-  # - name: set default target
-  #   shell: "firewall-cmd --permanent --set-target={{ firewalld_default_target }}"
-  #   when: firewalld_current_target.stdout != firewalld_default_target
-  #   register: firewalld_default_target_changed
-  # 
-  # - name: get the current enabled services
-  #   shell: "firewall-cmd --list-services"
-  #   changed_when: False
-  #   register: firewalld_current_services
-  # 
-  # - name: disable any unwanted services
-  #   firewalld:
-  #     service: "{{ item }}"
-  #     state: disabled
-  #     permanent: yes
-  #     immediate: yes
-  #   when: item not in firewalld_allowed_services
-  #   loop: "{{ firewalld_current_services.stdout.split(' ') }}"
+
   # 
   # - name: configure allowed services
   #   firewalld:

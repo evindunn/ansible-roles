@@ -10,4 +10,7 @@ firewalld_opts:
       target: DROP
       allowed_services:
         - ssh
+    - name: drop
+      allowed_services:
+        - ssh
 
