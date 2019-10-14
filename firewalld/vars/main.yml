@@ -1,0 +1,13 @@
+---
+
+pkgs:
+  - firewalld
+
+firewalld_opts:
+  default_zone: public
+  zones:
+    - name: public
+      target: DROP
+      allowed_services:
+        - ssh
+

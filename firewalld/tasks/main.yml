@@ -1,0 +1,85 @@
+---
+
+- name: use python3 for this role
+  set_fact:
+    ansible_python_interpreter: /usr/bin/python3
+
+- name: install packages
+  package:
+    name: "{{ item  }}"
+    state: present
+  loop: "{{ pkgs }}"
+
+- name: get the current zones
+  shell: "firewall-cmd --get-zones"
+  register: firewalld_current_zones
+  changed_when: False
+
+- name: remove zones not in ansible
+  file:
+    path: "/etc/firewalld/zones/{{ item }}.xml"
+    state: absent
+  when: item not in (firewalld_opts.zones | map(attribute='name'))
+  loop: "{{ firewalld_current_zones.stdout.split(' ') }}"
+  register: zones_removed
+
+- name: add zones from ansible
+  firewalld:
+    zone: "{{ item }}"
+    state: present
+    permanent: true
+  loop: "{{ firewalld_opts.zones | map(attribute='name') | list }}"
+
+- name: get the current default zone
+  shell: "firewall-cmd --get-default-zone"
+  register: firewalld_current_zone
+  changed_when: False
+
+- name: set the default zone
+  shell: "firewall-cmd --set-default-zone={{ firewalld_opts.default_zone }}"
+  when: firewalld_current_zone.stdout != firewalld_opts.default_zone
+  register: default_zone_changed
+
+- name: reload firewalld
+  shell: "firewall-cmd --reload"
+  when: zones_removed.changed or default_zone_changed.changed
+ 
+- name: determine zone targets
+  shell: "firewall-cmd --permanent --get-target --zone={{ item.name }}"
+  register: item.current_target
+  loop: "{{ firewalld_opts.zones }}"
+
+- name: update zone targets
+  shell: "firewall-cmd --permanent --set-target={{ item.target }} --zone={{ item.name }}"
+  when: item.current_target.stdout.strip() != item.target
+  loop: "{{ firewalld_opts.zones }}"
+
+  # - name: set default target
+  #   shell: "firewall-cmd --permanent --set-target={{ firewalld_default_target }}"
+  #   when: firewalld_current_target.stdout != firewalld_default_target
+  #   register: firewalld_default_target_changed
+  # 
+  # - name: get the current enabled services
+  #   shell: "firewall-cmd --list-services"
+  #   changed_when: False
+  #   register: firewalld_current_services
+  # 
+  # - name: disable any unwanted services
+  #   firewalld:
+  #     service: "{{ item }}"
+  #     state: disabled
+  #     permanent: yes
+  #     immediate: yes
+  #   when: item not in firewalld_allowed_services
+  #   loop: "{{ firewalld_current_services.stdout.split(' ') }}"
+  # 
+  # - name: configure allowed services
+  #   firewalld:
+  #     service: "{{ item }}"
+  #     zone: "{{ firewalld_default_zone }}"
+  #     state: enabled
+  #     permanent: yes
+  #     immediate: yes
+  #   loop: "{{ firewalld_allowed_services }}"
+  #  
+
