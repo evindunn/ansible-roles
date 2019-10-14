@@ -10,18 +10,25 @@
     state: present
   loop: "{{ pkgs }}"
 
-- name: get the current zones
-  shell: "firewall-cmd --get-zones"
-  register: firewalld_current_zones
-  changed_when: False
+# Firewalld is straight up broken in debian without this
+- name: configure the firewalld daemon in debian-based systems
+  lineinfile:
+    path: /etc/firewalld/firewalld.conf
+    regexp: '^#?\s*IndividualCalls=.*'
+    line: IndividualCalls=yes
+  when: ansible_os_family == "Debian"
+  register: firewalld_reconfigured
 
-- name: remove zones not in ansible
-  file:
-    path: "/etc/firewalld/zones/{{ item }}.xml"
-    state: absent
-  when: item not in (firewalld_opts.zones | map(attribute='name'))
-  loop: "{{ firewalld_current_zones.stdout.split(' ') }}"
-  register: zones_removed
+- name: restart firewalld if it's been reconfigured
+  service:
+    name: firewalld
+    state: restarted
+  when: firewalld_reconfigured.changed
+
+- name: make sure firewalld is running
+  service:
+    name: firewalld
+    state: started
 
 - name: add zones from ansible
   firewalld:
@@ -42,17 +49,23 @@
 
 - name: reload firewalld
   shell: "firewall-cmd --reload"
-  when: zones_removed.changed or default_zone_changed.changed
+  when: default_zone_changed.changed
  
 - name: determine zone targets
   shell: "firewall-cmd --permanent --get-target --zone={{ item.name }}"
   register: item.current_target
   loop: "{{ firewalld_opts.zones }}"
+  changed_when: False
 
-- name: update zone targets
-  shell: "firewall-cmd --permanent --set-target={{ item.target }} --zone={{ item.name }}"
-  when: item.current_target.stdout.strip() != item.target
+- name: debug
+  debug:
+    msg: "{{ item }}"
   loop: "{{ firewalld_opts.zones }}"
+
+  # - name: update zone targets
+  #   shell: "firewall-cmd --permanent --set-target={{ item.target }} --zone={{ item.name }}"
+  #   when: item.current_target.stdout.strip() != item.target
+  #   loop: "{{ firewalld_opts.zones }}"
 
   # - name: set default target
   #   shell: "firewall-cmd --permanent --set-target={{ firewalld_default_target }}"
