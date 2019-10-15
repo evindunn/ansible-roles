@@ -1,0 +1,38 @@
+---
+
+- name: install pkgs
+  package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ pkgs }}"
+  notify: enable/start bind
+
+- name: configure named.conf.options
+  template:
+    src: named.conf.options.j2
+    dest: /etc/bind/named.conf.options
+  notify: restart bind
+
+- name: configure named.conf.local
+  template:
+    src: named.conf.local.j2
+    dest: /etc/bind/named.conf.local
+  notify: restart bind
+
+- name: configure forward zones
+  template:
+    src: db.forward.j2
+    dest: "/etc/bind/db.{{ item.name }}"
+  loop: "{{ dns_opts.forward_zones }}"
+  register: forward_zones
+  notify: restart bind
+
+- name: configure reverse zones
+  template:
+    src: db.reverse.j2
+    dest: "/etc/bind/db.{{ item.name }}"
+  loop: "{{ dns_opts.reverse_zones }}"
+  register: reverse_zones
+  notify: restart bind
+
+

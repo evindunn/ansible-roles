@@ -1,0 +1,22 @@
+; vim: ft=jinja
+
+; {{ ansible_managed }}
+
+$TTL	604800
+@	IN	SOA	{{ ansible_host }}.{{ item.name }}. root.{{ ansible_host }}.{{ item.name }}. (
+			 {{ item.serial }}      ; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 604800 )	; Negative Cache TTL
+;
+
+{% if 'dnsservers' in groups %}
+    {% for host in groups['dnsservers'] %}
+        IN      NS      {{ host }}.
+    {% endfor %}
+{% endif %}
+
+{% for host in dns_opts.hosts %}
+{{ host.name }}.     IN      A   {{ host.addr }}
+{% endfor %}

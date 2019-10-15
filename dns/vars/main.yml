@@ -1,0 +1,9 @@
+---
+
+service_name: bind9
+pkgs:
+  - bind9
+  - bind9utils
+  - dnsutils
+
+

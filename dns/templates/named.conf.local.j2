@@ -1,0 +1,16 @@
+# {{ ansible_managed }}
+
+{% for zone in dns_opts.forward_zones + dns_opts.reverse_zones %}
+zone "{{ zone.name }}" {
+    type {{ zone.type }};
+    file "/etc/bind/db.{{ zone.name }}";
+    allow-transfer {
+        {% if 'dnsservers' in groups %} 
+            {% for host in groups['dnsservers'] %}
+                {{ hostvars[host].ansible_default_ipv4.address }};
+            {% endfor %} 
+        {% endif %}
+    };
+};
+{% endfor %}
+

@@ -1,0 +1,22 @@
+---
+
+dns_opts:
+  forwarders:
+    - 8.8.8.8
+    - 8.8.4.4
+  trusted_clients:
+    - 127.0.0.1/8
+    - 192.168.1.1/24
+  forward_zones:
+    - name: localnet
+      serial: 3
+      type: master
+      allow-transfer: []
+  reverse_zones:
+    - name: 168.192.in-addr.arpa
+      serial: 3
+      type: master
+      allow_transfer: []
+  hosts: []
+
+
