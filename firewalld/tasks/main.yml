@@ -73,7 +73,6 @@
     tmp_list: "{{ tmp_list | default([]) + [{ 'zone': item.item.name, 'services': item.stdout.split(' ') }] }}"
   loop: "{{ current_services.results }}"
 
-
   # 
   # - name: configure allowed services
   #   firewalld:

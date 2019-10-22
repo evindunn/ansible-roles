@@ -1,5 +1,8 @@
 ---
 
+- name: include os-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
 - name: install pkgs
   package:
     name: "{{ item }}"
@@ -7,22 +10,27 @@
   loop: "{{ pkgs }}"
   notify: enable/start bind
 
+- name: create bind config directory
+  file:
+    path: "{{ dns_config_dir }}"
+    state: directory
+
 - name: configure named.conf.options
   template:
     src: named.conf.options.j2
-    dest: /etc/bind/named.conf.options
+    dest: "{{ dns_config_dir }}/named.conf.options"
   notify: restart bind
 
 - name: configure named.conf.local
   template:
     src: named.conf.local.j2
-    dest: /etc/bind/named.conf.local
+    dest: "{{ dns_config_dir }}/named.conf.local"
   notify: restart bind
 
 - name: configure forward zones
   template:
     src: db.forward.j2
-    dest: "/etc/bind/db.{{ item.name }}"
+    dest: "{{ dns_config_dir }}/db.{{ item.name }}"
   loop: "{{ dns_opts.forward_zones }}"
   register: forward_zones
   notify: restart bind
@@ -30,7 +38,7 @@
 - name: configure reverse zones
   template:
     src: db.reverse.j2
-    dest: "/etc/bind/db.{{ item.name }}"
+    dest: "{{ dns_config_dir }}/db.{{ item.name }}"
   loop: "{{ dns_opts.reverse_zones }}"
   register: reverse_zones
   notify: restart bind
