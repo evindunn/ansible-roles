@@ -1,0 +1,6 @@
+---
+
+deps:
+  - device-mapper-persistent-data
+  - lvm2
+  - yum-utils

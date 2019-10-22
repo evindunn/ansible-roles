@@ -24,6 +24,11 @@
     executable: /bin/bash
   when: docker_installed.rc != 0
 
+- name: make sure the docker config directory exists
+  file:
+    path: /etc/docker/
+    state: directory
+
 - name: configure the docker daemon
   template:
     src: docker.daemon.json.j2
