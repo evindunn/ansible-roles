@@ -8,12 +8,13 @@ dns_opts:
     - 127.0.0.1/8
     - 192.168.1.1/24
   forward_zones:
-    - name: localnet
+    - name: localdomain.net
       serial: 3
       type: master
       allow-transfer: []
   reverse_zones:
     - name: 168.192.in-addr.arpa
+      domain: localdomain.net
       serial: 3
       type: master
       allow_transfer: []
