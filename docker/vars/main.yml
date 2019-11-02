@@ -3,6 +3,3 @@
 pkgs:
   - docker-ce
 
-# docker_daemon_opts:
-#   userns-remap: default
-
