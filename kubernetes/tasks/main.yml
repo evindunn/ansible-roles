@@ -1,19 +1,5 @@
 ---
 
-- name: make sure docker is installed
-  include_role:
-    name: docker
-  vars:
-    pkgs:
-      - docker-ce
-    docker_daemon_opts:
-      storage-driver: overlay2
-      exec-opts: 
-        - native.cgroupdriver=systemd
-      log-driver: json-file
-      log-opts:
-        max-size: 100m  
-
 - name: include os-specific variables
   include_vars: "{{ item }}"
   loop:
