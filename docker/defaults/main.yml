@@ -1,0 +1,6 @@
+---
+
+pkgs:
+  - docker-ce
+
+docker_daemon_opts: {}

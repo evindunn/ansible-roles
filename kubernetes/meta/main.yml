@@ -1,4 +1,6 @@
-dependences:
+---
+
+dependencies:
   - role: docker
     vars:
       pkgs:

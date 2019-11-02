@@ -1,0 +1,26 @@
+- name: symlink /etc/resolv.conf
+  file:
+    path: /etc/resolv.conf
+    state: link
+    src: /run/systemd/resolve/stub-resolv.conf
+  notify: restart systemd-resolved
+
+- name: configure dns servers
+  replace:
+    path: /etc/systemd/resolved.conf
+    regexp: "^#?DNS=.*"
+    replace: "DNS={{ groups['dnsservers'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | join(',') }}"
+  notify: restart systemd-resolved
+
+- name: configure fallback dns servers
+  replace:
+    path: /etc/systemd/resolved.conf
+    regexp: "^#?FallbackDNS=.*"
+    replace: "FallbackDNS={{ fallback_dns | join(',') }}"
+  notify: restart systemd-resolved
+
+- name: make sure systemd-resolved is enabled
+  service:
+    name: systemd-resolved
+    enabled: yes
+
