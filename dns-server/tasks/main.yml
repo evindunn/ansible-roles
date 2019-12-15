@@ -1,46 +1,24 @@
 ---
 
-- name: include os-specific variables
-  include_vars: "{{ ansible_os_family }}.yml"
-
-- name: install pkgs
+- name: install dnsmasq
   package:
-    name: "{{ item }}"
+    name: dnsmasq
     state: present
-  loop: "{{ pkgs }}"
-  notify: enable/start bind
+  
+- name: make sure dnsmasq is enabled
+  service:
+    name: dnsmasq
+    enabled: yes
 
-- name: create bind config directory
-  file:
-    path: "{{ dns_config_dir }}"
-    state: directory
-
-- name: configure named.conf.options
+- name: write /etc/dnsmasq.conf
   template:
-    src: named.conf.options.j2
-    dest: "{{ dns_config_dir }}/named.conf.options"
-  notify: restart bind
+    src: dnsmasq.conf.j2
+    dest: /etc/dnsmasq.conf
+  notify: restart dnsmasq
 
-- name: configure named.conf.local
+- name: write /etc/hosts
   template:
-    src: named.conf.local.j2
-    dest: "{{ dns_config_dir }}/named.conf.local"
-  notify: restart bind
-
-- name: configure forward zones
-  template:
-    src: db.forward.j2
-    dest: "{{ dns_config_dir }}/db.{{ item.name }}"
-  loop: "{{ dns_opts.forward_zones }}"
-  register: forward_zones
-  notify: restart bind
-
-- name: configure reverse zones
-  template:
-    src: db.reverse.j2
-    dest: "{{ dns_config_dir }}/db.{{ item.name }}"
-  loop: "{{ dns_opts.reverse_zones }}"
-  register: reverse_zones
-  notify: restart bind
-
-
+    src: hosts.j2
+    dest: /etc/hosts
+  notify: restart dnsmasq
+  

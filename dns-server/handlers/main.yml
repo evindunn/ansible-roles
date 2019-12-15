@@ -1,13 +1,7 @@
 ---
 
-- name: enable/start bind
+- name: restart dnsmasq
   service:
-    name: "{{ service_name }}"
-    enabled: yes
-    state: started
-
-- name: restart bind
-  service:
-    name: "{{ service_name }}"
+    name: dnsmasq
     state: restarted
 

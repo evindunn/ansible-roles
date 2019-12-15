@@ -1,26 +1,50 @@
+- name: make sure systemd-resolved is installed
+  package:
+    name: systemd-resolved
+    state: present
+
+- name: make sure systemd-resolved is running
+  service:
+    name: systemd-resolved
+    state: started
+    enabled: yes
+
+- name: get /etc/resolv.conf info
+  stat:
+    path: /etc/resolv.conf
+  register: resolvconf_file
+
+- name: check if /etc/resolv.conf is a symlink
+  set_fact:
+    resolvconf_islnk: >
+      {{ resolvconf_file.stat.exists | bool }} and 
+      {{ resolvconf_file.stat.islnk | bool }}
+
+- name: delete the old resolvconf file
+  file:
+    path: /etc/resolv.conf
+    state: absent
+  when: not resolvconf_islnk
+
 - name: symlink /etc/resolv.conf
   file:
     path: /etc/resolv.conf
     state: link
-    src: /run/systemd/resolve/stub-resolv.conf
+    src: /run/systemd/resolve/resolv.conf
   notify: restart systemd-resolved
 
 - name: configure dns servers
-  replace:
+  lineinfile:
     path: /etc/systemd/resolved.conf
-    regexp: "^#?DNS=.*"
-    replace: "DNS={{ groups['dnsservers'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | join(',') }}"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    insertafter: "[Resolve]"
+  loop:
+    - regexp: "^#?DNS=.*" 
+      line: "DNS={{ groups['dns-servers'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | join(',') }}"
+    - regexp: "^#?FallbackDNS=.*"
+      line: "FallbackDNS={{ dns_fallback_servers | join(' ') }}"
+    - regexp: "^#?Domains=.*"
+      line: "Domains={{ dns_domain }}"     
   notify: restart systemd-resolved
-
-- name: configure fallback dns servers
-  replace:
-    path: /etc/systemd/resolved.conf
-    regexp: "^#?FallbackDNS=.*"
-    replace: "FallbackDNS={{ fallback_dns | join(',') }}"
-  notify: restart systemd-resolved
-
-- name: make sure systemd-resolved is enabled
-  service:
-    name: systemd-resolved
-    enabled: yes
 

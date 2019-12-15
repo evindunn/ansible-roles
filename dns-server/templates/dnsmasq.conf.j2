@@ -1,0 +1,14 @@
+# {{ ansible_managed }}
+
+no-resolv
+no-poll
+{% for server in dns_upstream_servers %}
+server={{ server }}
+{% endfor %}
+
+interface={{ ansible_default_ipv4.interface }}
+no-dhcp-interface={{ ansible_default_ipv4.interface }}
+bind-interfaces
+expand-hosts
+domain={{ dns_domain }}
+
