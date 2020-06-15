@@ -1,28 +1,29 @@
 ---
 
 - name: include os-specific variables
-  include_vars: "{{ item }}" 
-  loop:
-    - main.yml
-    - "{{ ansible_os_family }}.yml"
+  include_vars: "{{ ansible_distribution }}.yml"
 
 - name: install dependencies
   package:
     name: "{{ item }}"
     state: present
-  loop: "{{ deps }}"
+  loop: "{{ docker_deps }}"
 
-- name: check if docker is installed
-  shell: which docker
-  register: docker_installed
-  changed_when: False
-  failed_when: False
+- name: Include OS-specific tasks
+  include_tasks: "{{ ansible_distribution }}.yml"
 
-- name: install docker
-  shell: curl -fsSL get.docker.com | sh
-  args:
-    executable: /bin/bash
-  when: docker_installed.rc != 0
+- name: Install docker
+  package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ docker_pkgs }}"
+
+- name: Prevent docker upgrades (Ubuntu)
+  dpkg_selections:
+    name: "{{ item | regex_replace('=.+$', '') }}"
+    selection: hold
+  loop: "{{ docker_pkgs }}"
+  when: ansible_distribution == "Ubuntu"
 
 - name: make sure the docker config directory exists
   file:

@@ -1,0 +1,23 @@
+- name: Import the docker APT key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Determine the CPU architecture for apt
+  set_fact:
+    cpu_arch: amd64
+  when: ansible_architecture == "x86_64"
+
+- name: Determine the CPU architecture for apt
+  set_fact:
+    cpu_arch: arm64
+  when: ansible_architecture == "aarch64"
+
+- name: Determine the CPU architecture for apt
+  set_fact:
+    cpu_arch: armhf
+  when: ansible_architecture == "armv7l"
+
+- name: Add the docker repo
+  apt_repository:
+    repo: "deb [arch={{ cpu_arch }}] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable"

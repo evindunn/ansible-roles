@@ -1,6 +1,11 @@
 ---
 
-pkgs:
-  - docker-ce
+# k8s recommendations as of 2020-06-15
+# https://kubernetes.io/docs/setup/production-environment/container-runtimes/
+docker_daemon_opts:
+  storage-driver: overlay2
+  exec-opts: [native.cgroupdriver=systemd]
+  log-driver: json-file
+  log-opts:
+    max-size: 100m
 
-docker_daemon_opts: {}
