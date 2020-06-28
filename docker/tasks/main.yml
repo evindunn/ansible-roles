@@ -1,7 +1,7 @@
 ---
 
 - name: include os-specific variables
-  include_vars: "{{ ansible_distribution }}.yml"
+  include_vars: "{{ ansible_os_family }}.yml"
 
 - name: install dependencies
   package:
@@ -10,7 +10,7 @@
   loop: "{{ docker_deps }}"
 
 - name: Include OS-specific tasks
-  include_tasks: "{{ ansible_distribution }}.yml"
+  include_tasks: "{{ ansible_os_family }}.yml"
 
 - name: Install docker
   package:
@@ -23,7 +23,7 @@
     name: "{{ item | regex_replace('=.+$', '') }}"
     selection: hold
   loop: "{{ docker_pkgs }}"
-  when: ansible_distribution == "Ubuntu"
+  when: ansible_os_family == "Debian"
 
 - name: make sure the docker config directory exists
   file:
@@ -36,6 +36,24 @@
     dest: /etc/docker/daemon.json
     mode: '0644'
   notify: enable/restart docker
+
+- name: create docker service directory
+  file:
+    path: /etc/systemd/system/docker.service.d/
+    state: directory
+
+- name: configure mount flags
+  copy:
+    src: systemd-mount-flags.conf
+    dest: /etc/systemd/system/docker.service.d/mount-flags.cona
+  register: mount_flags
+
+- name: reload the docker daemon
+  service:
+    name: docker
+    enabled: yes
+    state: reloaded
+  when: mount_flags.changed
 
 - name: enable the docker daemon
   service:
