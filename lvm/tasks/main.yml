@@ -1,0 +1,75 @@
+# Finds all disks without any partitions & makes them into
+# a volume group
+
+- name: Make sure lvm2 is installed
+  package:
+    name: lvm2
+    state: latest
+
+- name: Check if the volume group exists already
+  shell: pvs -o pv_name,vg_name --reportformat json 
+  register: existing_pvs_cmd
+  changed_when: False
+
+- name: Check if the volume group exists already
+  set_fact: 
+    existing_pvs: |
+      {{ 
+        existing_pvs_cmd.stdout | 
+        from_json | 
+        json_query('report[*].pv[*]') | 
+        flatten | 
+        json_query("[?vg_name == '" + vg_name + "'].pv_name") 
+      }}
+  register: existing_pvs
+  
+- name: Read disk information
+  parted: 
+    device: "{{ item }}"
+    unit: MiB
+  loop: "{{ vg_disks }}"
+  register: parted_disk_info
+
+- name: Read disk information
+  set_fact:
+    disk_info: "{{ parted_disk_info.results | json_query('[*].{disk: disk.dev, partitions: partitions}') }}"
+
+- name: Wipe disk if necessary
+  parted:
+    device: "{{ item.0.disk }}"
+    number: "{{ item.1.num }}"
+    state: absent
+  when: "item[0].disk + '1' not in existing_pvs"
+  loop: "{{ disk_info | subelements('partitions') }}"
+  register: cleaned_disks
+  loop_control:
+    label: "{{ item[0].disk }}{{ item[1].num }}"
+
+- name: Create a partitions for pvs
+  parted:
+    device: "{{ item }}"
+    number: 1
+    state: present
+    flags: [ lvm ]
+  when: "item + '1' not in existing_pvs"
+  loop: "{{ vg_disks }}"
+  register: created_partition_disks
+
+- name: Create a data volume group
+  lvg:
+    vg: "{{ vg_name }}"
+    pvs: "{{ vg_disks | map('regex_replace', '$', '1') | list }}"
+
+- name: Create volumes
+  lvol:
+    vg: "{{ vg_name }}"
+    lv: "{{ item.name }}"
+    size: "{{ item.size }}"
+  loop: "{{ lvs }}"
+
+- name: Format the volumes
+  filesystem:
+    dev: "/dev/mapper/{{ vg_name }}-{{ item.name }}"
+    fstype: "{{ item.fstype }}"
+  loop: "{{ lvs }}"
+

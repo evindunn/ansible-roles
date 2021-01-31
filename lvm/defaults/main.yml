@@ -1,0 +1,4 @@
+vg_name: "vg_{{ ansible_hostname }}"
+vg_disks: []
+lvs: []
+

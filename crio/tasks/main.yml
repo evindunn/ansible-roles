@@ -22,52 +22,6 @@
     sysctl_file: /etc/sysctl.d/99-crio.conf
   loop: "{{ crio_sysctl_keys }}"
 
-- name: Query disks
-  shell: lsblk --json
-  register: all_disks
-  changed_when: False
-
-- name: Get available disks
-  set_fact:
-    avail_disks: "{{ all_disks.stdout | from_json | json_query('blockdevices[?type == `disk` && !children]') }}"
-
-- name: Create a partitions for pvs
-  parted:
-    device: "/dev/{{ item.name }}"
-    number: 1
-    state: present
-  loop: "{{ avail_disks }}"
-  register: created_partition_disks
-
-- name: Get created partitions
-  set_fact:
-    created_partitions: "{{ item }}1"
-  loop: "{{ created_partition_disks.results | json_query('[*].disk.dev') }}"
-
-- name: Create a data volume group
-  lvg:
-    vg: "vg_{{ ansible_hostname }}"
-    pvs: "{{ created_partitions }}"
-  when: created_partitions is defined
-  register: created_volume_group
-
-- name: Create a logical vol for cri-o
-  lvol:
-    lv: lv_crio
-    vg: "vg_{{ ansible_hostname }}"
-    size: 8G
-  when: created_volume_group.changed
-
-- name: Set the cri-o volume path
-  set_fact:
-    crio_volume: "/dev/mapper/vg_{{ ansible_hostname }}-lv_crio"
-
-- name: Format the cri-o volume
-  filesystem:
-    dev: "{{ crio_volume }}"
-    fstype: ext4
-  when: created_volume_group.changed
-
 - name: Mount the cri-o volume
   mount:
     src: "{{ crio_volume }}" 
@@ -75,7 +29,6 @@
     state: mounted
     fstype: ext4
     opts: noatime
-  when: created_volume_group.changed
 
 - name: Set cri-o OS version
   set_fact:
