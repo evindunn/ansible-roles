@@ -5,18 +5,16 @@
 
 - name: install dependencies
   package:
-    name: "{{ item }}"
+    name: "{{ docker_deps }}"
     state: present
-  loop: "{{ docker_deps }}"
 
 - name: Include OS-specific tasks
   include_tasks: "{{ ansible_os_family }}.yml"
 
 - name: Install docker
   package:
-    name: "{{ item }}"
+    name: "{{ docker_pkgs }}"
     state: present
-  loop: "{{ docker_pkgs }}"
 
 - name: Prevent docker upgrades (Ubuntu)
   dpkg_selections:

@@ -8,9 +8,9 @@ docker_deps:
   - software-properties-common
   - uidmap
 
-# K8s compatible as of 2020-06-15
-# https://kubernetes.io/docs/setup/production-environment/container-runtimes
+# Latest as of 2022-01-24
 docker_pkgs:
-  - containerd.io=1.2.13-2
-  - "docker-ce=5:19.03.11~3-0~{{ ansible_distribution | lower  }}-{{ ansible_lsb.codename }}"
+  - "containerd.io=1.4.12-1"
+  - "docker-ce=5:20.10.12~3-0~{{ ansible_distribution | lower  }}-{{ ansible_lsb.codename }}"
+  - "docker-ce-cli=5:20.10.12~3-0~{{ ansible_distribution | lower  }}-{{ ansible_lsb.codename }}"
 
