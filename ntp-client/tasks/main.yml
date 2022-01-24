@@ -6,14 +6,13 @@
     name: "{{ service_name }}"
     state: started
     enabled: yes
-  changed_when: False
 
 - name: check the timezone
   set_fact:
     current_timezone: "{{ item }}"
   with_file: "/etc/timezone"
   delegate_to: "{{ ansible_hostname }}"
-  changed_when: False
+  changed_when: false
 
 - name: set the timezone
   shell: "timedatectl set-timezone '{{ timezone }}'"

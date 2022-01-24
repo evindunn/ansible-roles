@@ -1,0 +1,24 @@
+- name: Update /etc/locale.gen
+  lineinfile:
+    path: /etc/locale.gen
+    line: "{{ locale }}"
+    regexp: "^\\s*#?\\s*{{ locale }}"
+  register: locale_gen
+
+- name: Generate the locales
+  shell: locale-gen
+  when: locale_gen.changed
+
+- name: Set the locale
+  lineinfile:
+    path: /etc/default/locale
+    line: "LANG={{ locale }}"
+    regexp: "LANG=.*" 
+  notify: Reboot
+
+- name: Set the keyboard layout
+  lineinfile:
+    path: /etc/default/keyboard
+    line: 'XKBLAYOUT="{{ keyboard_layout }}"'
+    regexp: "XKBLAYOUT=.*"
+  notify: Reboot
