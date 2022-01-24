@@ -1,0 +1,17 @@
+---
+
+- name: Add authorized_keys
+  authorized_key:
+    user: "{{ item.user }}"
+    state: "{{ item.state | default('present') }}"
+    key: "{{ item.key }}"
+  loop: "{{ authorized_keys }}"
+  when: item.user is defined and item.key is defined
+
+- name: Disable password logins
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    line: PasswordAuthentication no
+    regexp: "^\\s*#?\\s*PasswordAuthentication .*"
+  when: disable_ssh_passwords
+  notify: Reload sshd
