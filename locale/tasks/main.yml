@@ -1,8 +1,8 @@
 - name: Update /etc/locale.gen
   lineinfile:
     path: /etc/locale.gen
-    line: "{{ locale }}"
-    regexp: "^\\s*#?\\s*{{ locale }} {{ (locale | split(".") | last) }}"
+    line: "{{ locale }} {{ (locale | split('.') | last) }}"
+    regexp: "^\\s*#?\\s*{{ locale }}"
   register: locale_gen
 
 - name: Generate the locales
