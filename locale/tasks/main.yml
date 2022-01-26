@@ -2,7 +2,7 @@
   lineinfile:
     path: /etc/locale.gen
     line: "{{ locale }}"
-    regexp: "^\\s*#?\\s*{{ locale }}"
+    regexp: "^\\s*#?\\s*{{ locale }} {{ (locale | split(".") | last) }}"
   register: locale_gen
 
 - name: Generate the locales
