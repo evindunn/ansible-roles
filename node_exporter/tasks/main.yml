@@ -18,6 +18,12 @@
     extra_opts: ["--strip-components=1"]
   notify: Restart node-exporter
 
+- name: Create the node-exporter user
+  user:
+    name: node-exporter
+    shell: /bin/bash
+    system: true
+
 - name: Configure systemd
   template:
     src: node-exporter.service.j2
