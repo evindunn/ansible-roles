@@ -1,0 +1,9 @@
+[Unit]
+Description=Node Exporter
+After=network.target
+
+[Service]
+ExecStart={{ node_exporter_directory }}/node_exporter --web.listen-address="{{ node_exporter_listen_addr }}"
+
+[Install]
+WantedBy=multi-user.target
