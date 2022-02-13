@@ -1,23 +1,8 @@
 ---
 
-- include_vars: "{{ ansible_os_family }}.yml"
+- name: include os-specific tasks
+  include_tasks: "{{ ansible_os_family }}.yml"
 
-- name: Add the vault gpg key
-  apt_key:
-    url: "{{ vault_gpg_key }}"
-    state: present
-
-- name: Add the vault repo
-  apt_repository:
-    repo: "{{ vault_repo }}"
-    state: present
-    update_cache: true
-
-- name: Install vault
-  package:
-    name: vault
-    state: present
- 
 - name: Configure the vault server
   lineinfile:
     path: /etc/profile.d/vault.sh
