@@ -1,5 +1,0 @@
----
-
-deps:
-  - apt-transport-https
-  - curl
