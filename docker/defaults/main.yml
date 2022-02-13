@@ -12,3 +12,4 @@ docker_daemon_opts:
 
 # Current as of 2022-02-12
 docker_compose_version: 1.29.2
+docker_compose_switch_version: 1.0.4

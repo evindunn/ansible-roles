@@ -43,7 +43,7 @@
 - name: configure mount flags
   copy:
     src: systemd-mount-flags.conf
-    dest: /etc/systemd/system/docker.service.d/mount-flags.cona
+    dest: /etc/systemd/system/docker.service.d/mount-flags.conf
   register: mount_flags
 
 - name: reload the docker daemon
@@ -59,9 +59,33 @@
     enabled: yes
     state: started
 
+- name: create docker-compose directory
+  file:
+    path: /usr/local/lib/docker/cli-plugins
+    state: directory
+    recurse: true
+
 - name: install docker-compose
   get_url:
-    url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-{{ ansible_system }}-{{ ansible_architecture }}"
-    dest: /usr/local/bin/docker-compose
+    url: "https://github.com/docker/compose/releases/download/v{{ docker_compose_version }}/docker-compose-{{ ansible_system }}-{{ ansible_architecture }}"
+    dest: /usr/local/lib/docker/cli-plugins/docker-compose
     mode: "0755"
 
+- set_fact:
+    deb_architecture: amd64
+  when: ansible_architecture == "x86_64"
+
+- set_fact:
+    deb_architecture: arm64
+  when: ansible_architecture == "aarch64"
+
+- name: install compose-switch
+  get_url:
+    url: "https://github.com/docker/compose-switch/releases/download/v{{ docker_compose_switch_version }}/docker-compose-{{ ansible_system }}-{{ deb_architecture.stdout | trim }}"
+    dest: /usr/local/bin/docker-compose
+    mode: "0755"a
+    when: deb_architecture is defined
+
+- debug:
+    msg: "compose-switch is not supported on {{ ansible_architecture }}"
+  when: deb_architecture is not defined
