@@ -67,9 +67,10 @@
 
 - name: install docker-compose
   get_url:
-    url: "https://github.com/docker/compose/releases/download/v{{ docker_compose_version }}/docker-compose-{{ ansible_system }}-{{ ansible_architecture }}"
+    url: "https://github.com/docker/compose/releases/download/v{{ docker_compose_version }}/docker-compose-{{ ansible_system | lower }}-{{ ansible_architecture }}"
     dest: /usr/local/lib/docker/cli-plugins/docker-compose
     mode: "0755"
+  notify: enable/restart docker
 
 - set_fact:
     deb_architecture: amd64
@@ -81,10 +82,10 @@
 
 - name: install compose-switch
   get_url:
-    url: "https://github.com/docker/compose-switch/releases/download/v{{ docker_compose_switch_version }}/docker-compose-{{ ansible_system }}-{{ deb_architecture.stdout | trim }}"
+    url: "https://github.com/docker/compose-switch/releases/download/v{{ docker_compose_switch_version }}/docker-compose-{{ ansible_system | lower }}-{{ deb_architecture }}"
     dest: /usr/local/bin/docker-compose
     mode: "0755"
-    when: deb_architecture is defined
+  when: deb_architecture is defined
 
 - debug:
     msg: "compose-switch is not supported on {{ ansible_architecture }}"
