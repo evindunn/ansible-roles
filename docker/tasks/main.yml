@@ -83,7 +83,7 @@
   get_url:
     url: "https://github.com/docker/compose-switch/releases/download/v{{ docker_compose_switch_version }}/docker-compose-{{ ansible_system }}-{{ deb_architecture.stdout | trim }}"
     dest: /usr/local/bin/docker-compose
-    mode: "0755"a
+    mode: "0755"
     when: deb_architecture is defined
 
 - debug:
