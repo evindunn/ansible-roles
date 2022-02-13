@@ -10,3 +10,5 @@ docker_daemon_opts:
   log-opts:
     max-size: 100m
 
+# Current as of 2022-02-12
+docker_compose_version: 1.29.2
