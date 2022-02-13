@@ -1,3 +1,0 @@
-- name: Created volumes
-  set_fact:
-    created_volumes: True
