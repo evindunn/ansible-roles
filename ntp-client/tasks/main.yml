@@ -8,13 +8,11 @@
     enabled: yes
 
 - name: check the timezone
-  set_fact:
-    current_timezone: "{{ item }}"
-  with_file: "/etc/timezone"
-  delegate_to: "{{ ansible_hostname }}"
-  changed_when: false
+  slurp:
+    src: /etc/timezone
+  register: current_timezone
 
 - name: set the timezone
   shell: "timedatectl set-timezone '{{ timezone }}'"
-  when: current_timezone != timezone
+  when: (current_timezone["content"] | b64decode | trim) != timezone
 
