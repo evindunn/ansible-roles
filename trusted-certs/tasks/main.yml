@@ -1,0 +1,19 @@
+---
+
+- include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Make sure ca-certficates is installed
+  package:
+    name: ca-certificates
+    state: present
+
+- name: Copy the trusted certificates to the host
+  copy:
+    src: "{{ item }}"
+    dest: "{{ ca_certs_dir }}/{{ item }}"
+  loop: "{{ trusted_certs }}"
+  register: cert_copy
+
+- name: Update the CA trust
+  shell: "{{ update_certs_command }}"
+  when: cert_copy.changed

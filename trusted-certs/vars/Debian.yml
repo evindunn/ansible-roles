@@ -1,0 +1,4 @@
+---
+
+ca_certs_dir: /usr/local/share/ca-certificates
+update_certs_command: update-ca-certificates
