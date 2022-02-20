@@ -1,0 +1,14 @@
+---
+
+- name: Add the postgres gpg key
+  apt_key:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    keyring: "{{ gpg_keyring }}"
+    state: present
+
+- name: Add the postgres repo 
+  apt_repository:
+    repo: 'deb [signed-by="{{ gpg_keyring }}"] http://apt.postgresql.org/pub/repos/apt {{ ansible_distribution_release }}-pgdg main'
+    filename: postgres
+    state: present
+

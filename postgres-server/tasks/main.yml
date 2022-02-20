@@ -1,0 +1,7 @@
+---
+
+- name: Install postgres
+  package:
+    name: "postgresql-{{ postgres_version }}"
+    state: present
+
