@@ -1,0 +1,14 @@
+---
+
+- name: Install nginx repo
+  blockinfile:
+    path: /etc/yum.repos.d/nginx.repo
+    block: |
+      [nginx]
+      name=nginx repo
+      baseurl=https://nginx.org/packages/centos/$releasever/$basearch/
+      gpgkey=https://nginx.org/keys/nginx_signing.key
+      gpgcheck=1
+      enabled=1
+      module_hotfixes=true
+
