@@ -5,11 +5,12 @@
 - name: Add the vault gpg key
   apt_key:
     url: "{{ hashicorp_gpg_key }}"
+    keyring: "{{ gpg_keyring }}"
     state: present
 
 - name: Add the vault repo
   apt_repository:
-    repo: "{{ hashicorp_repo }}"
+    repo: 'deb [signed-by="{{ gpg_keyring }}"] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main'
     state: present
     update_cache: true
 
