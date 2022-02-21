@@ -10,5 +10,5 @@
     mode: "0755"
     line: "export VAULT_ADDR={{ vault_addr }}"
     regexp: "export VAULT_ADDR=.*"
-
+  notify: enable/restart vault
 

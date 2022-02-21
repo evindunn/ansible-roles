@@ -18,4 +18,5 @@
   package:
     name: vault
     state: present
+  notify: enable/restart vault
  
