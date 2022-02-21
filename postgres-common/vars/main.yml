@@ -1,2 +1,2 @@
 ---
-gpg_keyring: /etc/apt/trusted.gpg.d/postgres.gpg
+postgres_gpg_keyring: /etc/apt/trusted.gpg.d/postgres.gpg

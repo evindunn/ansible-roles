@@ -3,12 +3,12 @@
 - name: Add the nginx gpg key
   apt_key:
     url: http://nginx.org/keys/nginx_signing.key
-    keyring: "{{ keyring_file }}"
+    keyring: "{{ nginx_gpg_keyring }}"
     state: present
 
 - name: Add the nginx repo
   apt_repository:
-    repo: 'deb [signed-by="{{ keyring_file }}"] https://nginx.org/packages/{{ ansible_distribution | lower }}/ {{ ansible_distribution_release }} nginx'
+    repo: 'deb [signed-by="{{ nginx_gpg_keyring }}"] https://nginx.org/packages/{{ ansible_distribution | lower }}/ {{ ansible_distribution_release }} nginx'
     filename: nginx
     state: present
 

@@ -1,7 +1,6 @@
 ---
 
-keyring_file: /etc/apt/trusted.gpg.d/nginx.gpg
-
+nginx_gpg_keyring: /etc/apt/trusted.gpg.d/nginx.gpg
 pkgs:
   - nginx
   - nginx-common
