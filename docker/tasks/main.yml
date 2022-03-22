@@ -23,6 +23,18 @@
   loop: "{{ docker_pkgs }}"
   when: ansible_os_family == "Debian"
 
+- block:
+  - name: Make sure dnf versionlock is installed
+    package:
+      name: dnf-plugins-core
+      state: present
+
+  - name: Prevent docker upgrades (RedHat)
+    shell: "{{ item | regex_replace('=.+$', '') }}"
+    loop: "{{ docker_pkgs }}"
+
+  when: ansible_os_family == "RedHat"
+
 - name: make sure the docker config directory exists
   file:
     path: /etc/docker/

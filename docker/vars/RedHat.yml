@@ -4,3 +4,9 @@ docker_deps:
   - device-mapper-persistent-data
   - lvm2
   - yum-utils
+
+# Latest as of 2022-03-22
+docker_pkgs:
+  - docker-ce-3:20.10.9-3.el8
+  - docker-ce-cli-1:20.10.9-3.el8
+  - containerd.io-1.5.10-3.1.el8
