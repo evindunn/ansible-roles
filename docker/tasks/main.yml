@@ -13,12 +13,13 @@
 
 - name: Install docker
   package:
-    name: "{{ docker_pkgs }}"
+    name: "{{ item.name }}{{ '-' if ansible_os_family == 'RedHat' else '=' }}{{ item.version }}"
     state: present
+  loop: "{{ docker_pkgs }}"
 
 - name: Prevent docker upgrades (Ubuntu)
   dpkg_selections:
-    name: "{{ item | regex_replace('=.+$', '') }}"
+    name: "{{ item.name }}"
     selection: hold
   loop: "{{ docker_pkgs }}"
   when: ansible_os_family == "Debian"
@@ -26,12 +27,13 @@
 - block:
   - name: Make sure dnf versionlock is installed
     package:
-      name: dnf-plugins-core
+      name: dnf-command(versionlock)
       state: present
 
   - name: Prevent docker upgrades (RedHat)
-    shell: "{{ item | regex_replace('=.+$', '') }}"
+    shell: "dnf versionlock add {{ item.name }}"
     loop: "{{ docker_pkgs }}"
+    changed_when: false
 
   when: ansible_os_family == "RedHat"
 

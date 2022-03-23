@@ -7,6 +7,9 @@ docker_deps:
 
 # Latest as of 2022-03-22
 docker_pkgs:
-  - docker-ce-3:20.10.9-3.el8
-  - docker-ce-cli-1:20.10.9-3.el8
-  - containerd.io-1.5.10-3.1.el8
+  - name: docker-ce
+    version: 3:20.10.9-3.el8
+  - name: docker-ce-cli
+    version: 1:20.10.9-3.el8
+  - name: containerd.io
+    version: 1.5.10-3.1.el8
