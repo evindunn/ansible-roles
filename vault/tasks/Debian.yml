@@ -14,9 +14,3 @@
     state: present
     update_cache: true
 
-- name: Install vault
-  package:
-    name: vault
-    state: present
-  notify: enable/restart vault
- 
