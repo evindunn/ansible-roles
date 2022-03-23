@@ -1,0 +1,7 @@
+---
+
+- name: Install chronyd
+  package:
+    name: chrony
+    state: present
+
