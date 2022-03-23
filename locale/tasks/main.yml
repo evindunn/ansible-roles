@@ -1,24 +1,51 @@
-- name: Update /etc/locale.gen
+- include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Update localegen config
   lineinfile:
-    path: /etc/locale.gen
+    path: "{{ localegen_file }}"
     line: "{{ locale }} {{ (locale | split('.') | last) }}"
     regexp: "^\\s*#?\\s*{{ locale }}"
   register: locale_gen
 
-- name: Generate the locales
-  shell: locale-gen
-  when: locale_gen.changed
+- when: ansible_os_family == "Debian"
+  block:
+  - name: Update localegen config
+    lineinfile:
+      path: "{{ localegen_file }}"
+      line: "{{ locale }} {{ (locale | split('.') | last) }}"
+      regexp: "^\\s*#?\\s*{{ locale }}"
+    register: locale_gen
+
+  - name: Generate the locales
+    shell: locale-gen
+    when: locale_gen.changed
 
 - name: Set the locale
   lineinfile:
-    path: /etc/default/locale
-    line: "LANG={{ locale }}"
-    regexp: "LANG=.*" 
+    path: "{{ item.path }}"
+    line: 'LANG="{{ locale }}"'
+    regexp: "LANG=.*"
+  when: ansible_os_family == item.os
+  loop:
+    - os: Debian
+      path: /etc/default/locale
+
+    - os: RedHat
+      path: /etc/locale.conf
   notify: Reboot
 
-- name: Set the keyboard layout
+- name: Set the keyboard layout (Debian)
   lineinfile:
     path: /etc/default/keyboard
     line: 'XKBLAYOUT="{{ keyboard_layout }}"'
     regexp: "XKBLAYOUT=.*"
   notify: Reboot
+  when: ansible_os_family == "Debian"
+  
+- name: Set the keyboard layout (RedHat)
+  lineinfile:
+    path: /etc/vconsole.conf
+    line: 'KEYMAP="{{ keyboard_layout }}"'
+    regexp: "KEYMAP=.*"
+  notify: Reboot
+  when: ansible_os_family == "RedHat"
