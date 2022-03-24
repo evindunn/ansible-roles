@@ -1,0 +1,8 @@
+---
+
+- name: Install consul
+  package:
+    name: consul
+    state: present
+  notify: enable/restart consul
+

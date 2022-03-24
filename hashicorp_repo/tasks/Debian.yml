@@ -2,13 +2,13 @@
 
 - include_vars: "{{ ansible_os_family }}.yml"
 
-- name: Add the vault gpg key
+- name: Add the hashicorp gpg key
   apt_key:
     url: "{{ hashicorp_gpg_key }}"
     keyring: "{{ hashicorp_gpg_keyring }}"
     state: present
 
-- name: Add the vault repo
+- name: Add the hashicorp repo
   apt_repository:
     repo: 'deb [signed-by="{{ hashicorp_gpg_keyring }}"] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main'
     state: present
