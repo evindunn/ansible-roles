@@ -1,0 +1,7 @@
+---
+- import_tasks: "{{ ansible_os_family }}".yml
+
+- name: Install ansible
+  package:
+    name: ansible
+    state: present

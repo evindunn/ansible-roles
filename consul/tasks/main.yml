@@ -5,4 +5,3 @@
     name: consul
     state: present
   notify: enable/restart consul
-

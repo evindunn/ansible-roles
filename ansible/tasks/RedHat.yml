@@ -1,0 +1,5 @@
+---
+- name: Install ansible prerequisites
+  package:
+    name: epel-release
+    state: present
