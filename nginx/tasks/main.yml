@@ -5,7 +5,7 @@
 
 - name: install packages
   package:
-    name: "{{ pkgs }}"
+    name: nginx
     state: present
   notify: enable/start nginx
 
