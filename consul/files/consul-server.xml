@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- https://www.consul.io/docs/install/ports -->
+<service>
+  <short>Consul Server</short>
+  <description>Consul is a service mesh solution providing a full featured control plane with service discovery, configuration, and segmentation functionality</description>
+  <!-- Agent ports -->
+  <include service="consul-agent"/>
+
+  <!-- DNS -->
+  <port protocol="tcp" port="8600"/>
+  <port protocol="udp" port="8600"/>
+
+  <!-- HTTPS -->
+  <port protocol="tcp" port="8501"/>
+
+  <!-- Serf LAN/WAN -->
+  <port protocol="tcp" port="8302"/>
+  <port protocol="udp" port="8302"/>
+
+  <!-- RPC Address -->
+  <port protocol="tcp" port="8300"/>
+</service>

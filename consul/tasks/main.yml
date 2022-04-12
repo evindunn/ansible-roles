@@ -5,3 +5,26 @@
     name: consul
     state: present
   notify: enable/restart consul
+
+- name: Check for firewalld
+  shell: "which firewall-cmd"
+  register: consul_firewalld
+  changed_when: false
+  failed_when: false
+
+- when: consul_firewalld.rc == 0
+  block:
+    - name: Copy firewalld config files
+      copy:
+        src: "{{ item }}"
+        dest: "/etc/firewalld/services/{{ item }}"
+      loop:
+        - consul-agent.xml
+        - consul-server.xml
+
+    - name: Enable the consul agent firewalld service
+      firewalld:
+        service: consul-agent
+        permanent: true
+        state: enabled
+
