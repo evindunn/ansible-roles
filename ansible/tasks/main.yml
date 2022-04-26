@@ -1,7 +1,39 @@
 ---
-- import_tasks: "{{ ansible_os_family }}".yml
 
-- name: Install ansible
+- include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Uninstall to OS version of ansible
   package:
     name: ansible
+    state: absent
+
+- name: Install the ansible prerequisites
+  package:
+    name: "{{ ansible_prereqs }}"
     state: present
+
+- name: Set the ansible virtualenv location
+  set_fact:
+    install_ansible_virtualenv: "/opt/ansible-{{ install_ansible_version }}"
+    install_ansible_python: "{{ 'python3.8' if ansible_os_family == 'RedHat' else 'python3' }}"
+
+- name: Create the ansible virtualenv
+  pip:
+    name: "pip"
+    state: latest
+    virtualenv: "{{ install_ansible_virtualenv }}"
+    virtualenv_python: "{{ install_ansible_python }}"
+    virtualenv_site_packages: true
+
+- name: Install ansible with pip
+  pip:
+    name: "{{ ['ansible=={}'.format(install_ansible_version)] + install_ansible_extra_pkgs }}"
+    virtualenv: "{{ install_ansible_virtualenv }}"
+
+- name: Add ansible to PATH in /etc/profile.d
+  template:
+    src: ZZ-add-ansible-to-path.sh.j2
+    dest: /etc/profile.d/ZZ-add-ansible-to-path.sh
+    mode: "0755"
+  vars:
+    ansible_venv_bin: "{{ install_ansible_virtualenv }}/bin"

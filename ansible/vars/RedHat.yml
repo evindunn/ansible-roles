@@ -1,0 +1,6 @@
+---
+ansible_prereqs:
+  - python38
+  - python38-pip
+  - python3-virtualenv
+  - python3-setuptools

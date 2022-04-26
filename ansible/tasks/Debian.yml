@@ -1,9 +1,0 @@
----
-- name: Install the prerequisites
-  package:
-    name: python3-apt
-    state: present
-
-- name: Add the ansible repository
-  apt_repository:
-    repo: ppa:ansible/ansible
