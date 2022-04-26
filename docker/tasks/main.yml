@@ -55,8 +55,8 @@
     state: directory
 
 - name: configure mount flags
-  copy:
-    src: systemd-mount-flags.conf
+  template:
+    src: systemd-mount-flags.conf.j2
     dest: /etc/systemd/system/docker.service.d/mount-flags.conf
   register: mount_flags
 

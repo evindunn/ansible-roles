@@ -13,3 +13,5 @@ docker_pkgs:
     version: 1:20.10.9-3.el8
   - name: containerd.io
     version: 1.5.10-3.1.el8
+
+systemd_mount_flags: ""
