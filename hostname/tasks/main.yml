@@ -1,9 +1,21 @@
-- name: Set hostname
-  hostname:
-    name: "{{ set_hostname }}"
+---
+- name: Look up dns hostname
+  set_fact:
+    set_hostname: "{{ lookup('dig', '{{ ansible_default_ipv4.address }}/PTR') }}"
 
-- name: Add hostname to /etc/hosts
-  lineinfile:
-    path: /etc/hosts
-    regexp: "127.0.0.1\\s+\\d{1-3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}"
-    line: "127.0.1.1 {{ set_hostname }}"
+- when: set_hostname not in ['NXDOMAIN', '']
+  block:
+    - name: Strip trailing dot & determine short hostname
+      set_fact:
+        set_hostname: "{{ set_hostname.strip('.') }}"
+        set_hostname_short: "{{ set_hostname | split('.') | first }}"
+
+    - name: Set hostname
+      hostname:
+        name: "{{ set_hostname_short }}"
+
+    - name: Add hostname to /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        regexp: '127\.0\.1\.1.*'
+        line: "127.0.1.1 {{ set_hostname_short }} {{ set_hostname }}"
