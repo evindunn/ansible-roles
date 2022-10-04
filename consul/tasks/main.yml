@@ -6,6 +6,28 @@
     state: present
   notify: enable/restart consul
 
+- when: consul_server
+  block:
+    - name: Create the consul data directory
+      file:
+        path: /var/lib/consul
+        state: directory
+        owner: consul
+        group: consul
+        mode: "0700"
+
+    - name: Create the consul service.d directory
+      file:
+        path: /etc/systemd/system/consul.service.d
+        state: directory
+      notify: systemctl daemon-reload
+
+    - name: Configure systemd for consul server
+      copy:
+        src: service-sysd-override.conf
+        dest: /etc/systemd/system/consul.service.d/overrides.conf
+      notify: systemctl daemon-reload
+
 - name: Check for firewalld
   shell: "which firewall-cmd"
   register: consul_firewalld
@@ -21,10 +43,11 @@
       loop:
         - consul-agent.xml
         - consul-server.xml
+      register: consul_firewalld_files
 
-    - name: Enable the consul agent firewalld service
-      firewalld:
-        service: consul-agent
-        permanent: true
-        state: enabled
+    - name: Reload firewalld
+      service:
+        name: firewalld
+        state: reloaded
+      when: consul_firewalld_files.changed
 

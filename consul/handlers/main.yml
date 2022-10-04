@@ -1,5 +1,9 @@
 ---
 
+- name: systemctl daemon-reload
+  systemd:
+    daemon_reload: true
+
 - name: enable/restart consul
   service:
     name: consul
