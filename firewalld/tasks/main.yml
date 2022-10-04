@@ -6,7 +6,7 @@
 
 - name: install packages
   package:
-    name: "{{ item  }}"
+    name: "{{ item }}"
     state: present
   loop: "{{ pkgs }}"
 
@@ -19,68 +19,30 @@
   when: ansible_os_family == "Debian"
   register: firewalld_reconfigured
 
+- name: configure firewalld zones
+  copy:
+    content: "{{ lookup('template', 'firewalld-zone.xml.j2', template_vars=item) }}"
+    dest: "/etc/firewalld/zones/{{ item.name }}.xml"
+  loop: "{{ firewalld_opts.zones | default([]) }}"
+  register: firewalld_zones
+
 - name: restart firewalld if it's been reconfigured
   service:
     name: firewalld
-    state: restarted
-  when: firewalld_reconfigured.changed
+    state: reloaded
+  when: firewalld_reconfigured.changed or firewalld_zones.changed
 
 - name: make sure firewalld is running
   service:
     name: firewalld
     state: started
+    enabled: true
 
-- name: add zones from ansible
-  firewalld:
-    zone: "{{ item }}"
-    state: present
-    permanent: true
-  loop: "{{ firewalld_opts.zones | map(attribute='name') | list }}"
+- name: determine the firewalld default zone
+  shell: firewall-cmd --get-default-zone
+  changed_when: false
+  register: current_firewalld_default_zone
 
-- name: get the default zone
-  shell: "firewall-cmd --get-default-zone"
-  register: firewalld_current_zone
-  changed_when: False
-
-- name: set the default zone
-  shell: "firewall-cmd --set-default-zone={{ firewalld_opts.default_zone }}"
-  when: firewalld_current_zone.stdout != firewalld_opts.default_zone
-  register: default_zone_changed
-
-- name: reload firewalld
-  shell: "firewall-cmd --reload"
-  when: default_zone_changed.changed
- 
-- name: determine zone targets
-  shell: "firewall-cmd --permanent --get-target --zone={{ item.name }}"
-  register: current_targets
-  loop: "{{ firewalld_opts.zones }}"
-  changed_when: False
-
-- name: update zone targets
-  shell: "firewall-cmd --permanent --set-target={{ item.item.target | default('DROP') }} --zone={{ item.item.name }}"
-  when: item.item.target is defined and item.stdout.strip() != item.item.target
-  loop: "{{ current_targets.results }}"
-
-- name: get the current enabled services
-  shell: "firewall-cmd --list-services --zone={{ item.name }}"
-  register: current_services
-  loop: "{{ firewalld_opts.zones }}"
-  changed_when: False
-
-- name: get the current enabled services
-  set_fact: 
-    tmp_list: "{{ tmp_list | default([]) + [{ 'zone': item.item.name, 'services': item.stdout.split(' ') }] }}"
-  loop: "{{ current_services.results }}"
-
-  # 
-  # - name: configure allowed services
-  #   firewalld:
-  #     service: "{{ item }}"
-  #     zone: "{{ firewalld_default_zone }}"
-  #     state: enabled
-  #     permanent: yes
-  #     immediate: yes
-  #   loop: "{{ firewalld_allowed_services }}"
-  #  
-
+- name: set the firewalld default zone
+  shell: "firewall-cmd --set-default-zone {{ firewalld_opts.default_zone | default('public') }}"
+  when: "current_firewalld_default_zone.stdout.strip() != firewalld_opts.default_zone | default('public')"

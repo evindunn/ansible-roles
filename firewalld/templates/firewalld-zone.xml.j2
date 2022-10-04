@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<zone target="{{ target | default('DROP') }}">
+  <short>{{ name }}</short>
+  <description>{{ description | default('Ansible-managed zone') }}</description>
+{% for interface in interfaces | default([]) %}
+  <interface name="{{ interface }}"/>
+{% endfor %}
+{% for service in services | default([]) %}
+  <service name="{{ service }}"/>
+{% endfor %}
+{% for port in ports | default([]) %}
+  <port port="{{ port.port }}" protocol="{{ port.protocol }}"/>
+{% endfor %}
+{% for address in addresses | default([]) %}
+  <source address="{{ address }}"/>
+{% endfor %}
+{% for ipset in ipsets | default([]) %}
+  <source ipset="{{ ipset }}"/>
+{% endfor %}
+{% for mac in macaddresses | default([]) %}
+  <source mac="{{ mac }}"/>
+{% endfor %}
+{% if forward | default(True) %}
+  <forward/>
+{% endif %}
+</zone>
+
