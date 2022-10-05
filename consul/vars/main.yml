@@ -1,0 +1,5 @@
+---
+
+# 2022-10-04
+consul_version: "1.13.2-1"
+envoy_version: "1.23.1"

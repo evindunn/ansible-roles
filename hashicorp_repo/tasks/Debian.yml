@@ -2,6 +2,11 @@
 
 - include_vars: "{{ ansible_os_family }}.yml"
 
+- name: make sure gnupg2 is installed
+  package:
+    name: gnupg2
+    state: present
+
 - name: Add the hashicorp gpg key
   apt_key:
     url: "{{ hashicorp_gpg_key }}"

@@ -1,0 +1,42 @@
+---
+
+- name: set the machine architecture
+  set_fact:
+    envoy_arch: "{{ 'amd64' if ansible_architecture == 'x86_64' else 'arm64' }}"
+  when: "ansible_architecture in ['aarch64', 'x86_64']"
+
+- name: make sure curl is installed
+  package:
+    name: curl
+    state: present
+
+- name: download func-e
+  get_url:
+    url: https://func-e.io/install.sh
+    dest: /tmp/install-func-e.sh
+    mode: "0755"
+
+- name: install func-e
+  shell: /tmp/install-func-e.sh -b /usr/local/bin
+  args:
+    creates: /usr/local/bin/func-e
+  environment:
+    FUNC_E_PLATFORM: "linux/{{ envoy_arch }}"
+
+- name: remove func-e install script
+  file:
+    path: /tmp/install-func-e.sh
+    state: absent
+
+- name: install envoy to /root
+  shell: "func-e use {{ envoy_version }}"
+  args:
+    creates: "/root/.func-e/versions/{{ envoy_version }}/bin/envoy"
+
+- name: move envoy to /usr/local/bin
+  copy:
+    src: "/root/.func-e/versions/{{ envoy_version }}/bin/envoy"
+    dest: "/usr/local/bin/envoy"
+    mode: "0755"
+    remote_src: true
+
