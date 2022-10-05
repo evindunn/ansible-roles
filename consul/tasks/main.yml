@@ -2,7 +2,7 @@
 
 - name: Install consul
   package:
-    name: consul
+    name: "consul={{ consul_version }}"
     state: present
   notify: enable/restart consul
 
@@ -50,4 +50,8 @@
         name: firewalld
         state: reloaded
       when: consul_firewalld_files.changed
+
+- name: include the envoy installation
+  import_tasks: envoy.yml
+  tags: envoy
 

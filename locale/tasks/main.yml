@@ -1,24 +1,21 @@
 - include_vars: "{{ ansible_os_family }}.yml"
 
+- name: Install locales
+  package:
+    name: locales
+    state: present
+
 - name: Update localegen config
   lineinfile:
     path: "{{ localegen_file }}"
     line: "{{ locale }} {{ (locale | split('.') | last) }}"
     regexp: "^\\s*#?\\s*{{ locale }}"
+    create: true
   register: locale_gen
 
-- when: ansible_os_family == "Debian"
-  block:
-  - name: Update localegen config
-    lineinfile:
-      path: "{{ localegen_file }}"
-      line: "{{ locale }} {{ (locale | split('.') | last) }}"
-      regexp: "^\\s*#?\\s*{{ locale }}"
-    register: locale_gen
-
-  - name: Generate the locales
-    shell: locale-gen
-    when: locale_gen.changed
+- name: Generate the locales
+  shell: locale-gen
+  when: locale_gen.changed
 
 - name: Set the locale
   lineinfile:
@@ -39,6 +36,7 @@
     path: /etc/default/keyboard
     line: 'XKBLAYOUT="{{ keyboard_layout }}"'
     regexp: "XKBLAYOUT=.*"
+    create: true
   notify: Reboot
   when: ansible_os_family == "Debian"
   

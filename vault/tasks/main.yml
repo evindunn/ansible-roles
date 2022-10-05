@@ -4,7 +4,6 @@
   package:
     name: vault
     state: present
-  notify: enable/restart vault
 
 - name: Configure the vault server
   lineinfile:
@@ -13,5 +12,9 @@
     mode: "0755"
     line: "export VAULT_ADDR={{ vault_addr }}"
     regexp: "export VAULT_ADDR=.*"
-  notify: enable/restart vault
 
+- name: Configure vault daemon
+  service:
+    name: vault
+    state: "{{ 'started' if vault_server else 'stopped' }}"
+    enabled: "{{ vault_server }}"
