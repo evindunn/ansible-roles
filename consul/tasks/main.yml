@@ -6,6 +6,25 @@
     state: present
   notify: enable/restart consul
 
+- tags: consul_template
+  block:
+    - name: install unzip
+      package:
+        name: unzip
+        state: present
+
+    - name: set the machine architecture
+      set_fact:
+        consul_templ_arch: "{{ 'amd64' if ansible_architecture == 'x86_64' else 'arm64' }}"
+      when: "ansible_architecture in ['aarch64', 'x86_64']"
+
+    - name: Install consul-template
+      unarchive:
+        src: "https://releases.hashicorp.com/consul-template/{{ consul_template_version }}/consul-template_{{ consul_template_version  }}_linux_{{ consul_templ_arch }}.zip"
+        dest: /usr/local/bin/
+        mode: "0755"
+        remote_src: true
+
 - when: consul_server
   block:
     - name: Create the consul data directory
