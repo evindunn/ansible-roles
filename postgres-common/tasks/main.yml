@@ -1,5 +1,10 @@
 ---
 
+- name: make sure gnupg2 is installed
+  package:
+    name: gnupg2
+    state: present
+
 - name: Add the postgres gpg key
   apt_key:
     url: https://www.postgresql.org/media/keys/ACCC4CF8.asc

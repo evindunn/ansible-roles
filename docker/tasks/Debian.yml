@@ -1,23 +1,28 @@
-- name: Import the docker APT key
-  apt_key:
-    url: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
-    state: present
+- name: check if we've imported the docker gpg key
+  stat:
+    path: /etc/apt/trusted.gpg.d/docker.gpg
+  register: docker_gpg
+
+- when: not docker_gpg.stat.exists or force_import_gpg | default(False)
+  block:
+    - name: download the docker APT key
+      get_url:
+        url: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+        dest: /tmp/docker.asc
+
+    - name: import the docker apt key
+      shell: gpg --dearmor -o /etc/apt/trusted.gpg.d/docker.gpg --yes /tmp/docker.asc
+
+    - name: remove the downloaded apt key
+      file:
+        path: /tmp/docker.asc
+        state: absent
 
 - name: Determine the CPU architecture for apt
-  set_fact:
-    cpu_arch: amd64
-  when: ansible_architecture == "x86_64"
-
-- name: Determine the CPU architecture for apt
-  set_fact:
-    cpu_arch: arm64
-  when: ansible_architecture == "aarch64"
-
-- name: Determine the CPU architecture for apt
-  set_fact:
-    cpu_arch: armhf
-  when: ansible_architecture == "armv7l"
+  shell: dpkg --print-architecture
+  changed_when: false
+  register: cpu_arch
 
 - name: Add the docker repo
   apt_repository:
-    repo: "deb [arch={{ cpu_arch }}] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_lsb.codename }} stable"
+    repo: "deb [arch={{ cpu_arch.stdout.strip() }} signed-by=/etc/apt/trusted.gpg.d/docker.gpg] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"

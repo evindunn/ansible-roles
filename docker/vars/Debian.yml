@@ -8,13 +8,4 @@ docker_deps:
   - software-properties-common
   - uidmap
 
-# Latest as of 2022-01-24
-docker_pkgs:
-  - name: containerd.io
-    version: 1.4.12-1
-  - name: docker-ce
-    version: "5:20.10.12~3-0~{{ ansible_distribution | lower  }}-{{ ansible_lsb.codename }}"
-  - name: docker-ce-cli
-    version: "5:20.10.12~3-0~{{ ansible_distribution | lower  }}-{{ ansible_lsb.codename }}"
-
 systemd_mount_flags: "shared"

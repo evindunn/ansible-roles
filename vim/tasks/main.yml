@@ -10,8 +10,6 @@
   loop: "{{ pkgs }}"
 
 - name: configure vim global defaults
-  lineinfile:
-    line: "{{ item }}"
-    path: "{{ vimrc_path }}"
-    create: yes
-  loop: "{{ vimrc_lines }}"
+  copy:
+    src: vimrc
+    dest: "{{ vimrc_path }}"

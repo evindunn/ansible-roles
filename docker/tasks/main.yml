@@ -13,13 +13,13 @@
 
 - name: Install docker
   package:
-    name: "{{ item.name }}{{ '-' if ansible_os_family == 'RedHat' else '=' }}{{ item.version }}"
+    name: "{{ item }}"
     state: present
   loop: "{{ docker_pkgs }}"
 
 - name: Prevent docker upgrades (Ubuntu)
   dpkg_selections:
-    name: "{{ item.name }}"
+    name: "{{ item }}"
     selection: hold
   loop: "{{ docker_pkgs }}"
   when: ansible_os_family == "Debian"
@@ -31,7 +31,7 @@
       state: present
 
   - name: Prevent docker upgrades (RedHat)
-    shell: "dnf versionlock add {{ item.name }}"
+    shell: "dnf versionlock add {{ item }}"
     loop: "{{ docker_pkgs }}"
     changed_when: false
 
