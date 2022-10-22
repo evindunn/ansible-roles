@@ -1,0 +1,8 @@
+// Do "apt-get update" automatically every n-days (0=disable)
+APT::Periodic::Update-Package-Lists "4";
+
+// Run the "unattended-upgrade" security upgrade script every n-days (0=disabled)
+APT::Periodic::Unattended-Upgrade "7";
+
+// Do "apt-get autoclean" every n-days (0=disable)
+APT::Periodic::AutocleanInterval "14";

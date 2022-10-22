@@ -1,0 +1,19 @@
+---
+
+- name: install dnf-automatic
+  package:
+    name: 
+      - dnf-automatic
+      - mailx
+    state: present
+
+- name: configure dnf-automatic
+  copy:
+    src: dnf-automatic.conf
+    dest: /etc/dnf/automatic.conf
+
+- name: make sure dnf-automatic is enabled
+  service:
+    name: dnf-automatic.timer
+    enabled: true
+

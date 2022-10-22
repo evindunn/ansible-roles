@@ -1,0 +1,52 @@
+// Unattended-Upgrade::Origins-Pattern controls which packages are
+// upgraded.
+//
+// Lines below have the format "keyword=value,...".  A
+// package will be upgraded only if the values in its metadata match
+// all the supplied keywords in a line.  (In other words, omitted
+// keywords are wild cards.) The keywords originate from the Release
+// file, but several aliases are accepted.  The accepted keywords are:
+//   a,archive,suite (eg, "stable")
+//   c,component     (eg, "main", "contrib", "non-free")
+//   l,label         (eg, "Debian", "Debian-Security")
+//   o,origin        (eg, "Debian", "Unofficial Multimedia Packages")
+//   n,codename      (eg, "jessie", "jessie-updates")
+//     site          (eg, "http.debian.net")
+// The available values on the system are printed by the command
+// "apt-cache policy", and can be debugged by running
+// "unattended-upgrades -d" and looking at the log file.
+//
+// Within lines unattended-upgrades allows 2 macros whose values are
+// derived from /etc/debian_version:
+//   ${distro_id}            Installed origin.
+//   ${distro_codename}      Installed codename (eg, "buster")
+Unattended-Upgrade::Origins-Pattern {
+        "origin=Debian,codename=${distro_codename}";
+        "origin=Debian,codename=${distro_codename}-updates";
+        "origin=Debian,codename=${distro_codename}-security";
+};
+
+// Python regular expressions, matching packages to exclude from upgrading
+Unattended-Upgrade::Package-Blacklist {
+	{% for package in upgrade_exclude_packages -%}
+		"{{ package }}";
+	{% endfor -%}
+};
+
+
+// Send email to this address for problems or packages upgrades
+// If empty or unset then no email is sent, make sure that you
+// have a working mail setup on your system. A package that provides
+// 'mailx' must be installed. E.g. "user@example.com"
+Unattended-Upgrade::Mail "root";
+
+// Set this value to one of:
+//    "always", "only-on-error" or "on-change"
+// If this is not set, then any legacy MailOnlyOnError (boolean) value
+// is used to chose between "only-on-error" and "on-change"
+Unattended-Upgrade::MailReport "only-on-error";
+
+// Do automatic removal of unused packages after the upgrade
+// (equivalent to apt-get autoremove)
+Unattended-Upgrade::Remove-Unused-Dependencies "true";
+
