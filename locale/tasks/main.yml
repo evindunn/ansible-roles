@@ -2,7 +2,7 @@
 
 - name: Install locales
   package:
-    name: locales
+    name: "{{ locales_pkg }}"
     state: present
 
 - name: Update localegen config
@@ -14,7 +14,7 @@
   register: locale_gen
 
 - name: Generate the locales
-  shell: locale-gen
+  shell: "{{ localegen_cmd }}"
   when: locale_gen.changed
 
 - name: Set the locale

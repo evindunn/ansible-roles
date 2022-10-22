@@ -1,3 +1,5 @@
 ---
 
+locales_pkg: glibc-langpack-en
+localegen_cmd: localectl set-locale LANG=en_US.UTF-8
 localegen_file: /etc/locale.conf
