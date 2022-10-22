@@ -13,9 +13,8 @@
 
 - name: Install docker
   package:
-    name: "{{ item }}"
+    name: "{{ docker_pkgs }}"
     state: present
-  loop: "{{ docker_pkgs }}"
 
 - name: Prevent docker upgrades (Ubuntu)
   dpkg_selections:
