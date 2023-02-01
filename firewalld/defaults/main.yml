@@ -1,2 +1,7 @@
 ---
-firewalld_opts: {}
+
+firewalld_default_zone: public
+firewalld_zones:
+  public:
+    target: DROP
+    services: [ssh]

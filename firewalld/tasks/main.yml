@@ -1,48 +1,46 @@
 ---
 
-- name: use python3 for this role
-  set_fact:
-    ansible_python_interpreter: /usr/bin/python3
-
-- name: install packages
+- name: make sure firewalld is installed
   package:
-    name: "{{ item }}"
-    state: present
-  loop: "{{ pkgs }}"
-
-# Firewalld is straight up broken in debian without this
-- name: configure the firewalld daemon in debian-based systems
-  lineinfile:
-    path: /etc/firewalld/firewalld.conf
-    regexp: '^#?\s*IndividualCalls=.*'
-    line: IndividualCalls=yes
-  when: ansible_os_family == "Debian"
-  register: firewalld_reconfigured
-
-- name: configure firewalld zones
-  copy:
-    content: "{{ lookup('template', 'firewalld-zone.xml.j2', template_vars=item) }}"
-    dest: "/etc/firewalld/zones/{{ item.name }}.xml"
-  loop: "{{ firewalld_opts.zones | default([]) }}"
-  register: firewalld_zones
-
-- name: restart firewalld if it's been reconfigured
-  service:
     name: firewalld
-    state: reloaded
-  when: firewalld_reconfigured.changed or firewalld_zones.changed
+    state: present
 
-- name: make sure firewalld is running
+- name: make sure firewalld is running/enabled
   service:
     name: firewalld
     state: started
     enabled: true
 
-- name: determine the firewalld default zone
+- name: determine the default zone
   shell: firewall-cmd --get-default-zone
   changed_when: false
-  register: current_firewalld_default_zone
+  register: firewalld_current_default_zone
 
-- name: set the firewalld default zone
-  shell: "firewall-cmd --set-default-zone {{ firewalld_opts.default_zone | default('public') }}"
-  when: "current_firewalld_default_zone.stdout.strip() != firewalld_opts.default_zone | default('public')"
+- name: determine the list of zones
+  shell: firewall-cmd --get-zones
+  changed_when: false
+  register: firewalld_current_zones
+
+- name: append the runtime zones to the configured zones
+  set_fact:
+    firewalld_zones: "{{ firewalld_zones | combine({item: {}}) }}"
+  when: item not in firewalld_zones.keys()
+  loop: "{{ firewalld_current_zones.stdout | split(' ') }}"
+
+- name: template the firewalld zones
+  template:
+    src: zone.xml.j2
+    dest: "{{ dest }}"
+  vars:
+    zone_name: "{{ item.key }}"
+    zone: "{{ item.value }}"
+    dest: "/etc/firewalld/zones/{{ item.key }}.xml"
+  loop_control:
+    label: "{{ dest }}"
+  loop: "{{ firewalld_zones | dict2items }}"
+  notify: firewalld reload
+
+- name: set the default zone
+  shell: "firewall-cmd --set-default-zone={{ firewalld_default_zone }}"
+  when: firewalld_current_default_zone.stdout.strip() != firewalld_default_zone
+  notify: firewalld reload
