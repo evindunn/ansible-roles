@@ -11,7 +11,6 @@
 - name: Disable password logins
   lineinfile:
     path: /etc/ssh/sshd_config
-    line: PasswordAuthentication no
+    line: "PasswordAuthentication {% if disable_ssh_passwords %}no{% else %}yes{% endif %}"
     regexp: "^\\s*#?\\s*PasswordAuthentication .*"
-  when: disable_ssh_passwords
   notify: Reload sshd

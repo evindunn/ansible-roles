@@ -71,3 +71,10 @@
     name: docker
     enabled: yes
     state: started
+
+- name: add users to docker group
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: docker
+    append: True
+  loop: "{{ docker_users }}"

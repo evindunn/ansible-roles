@@ -1,4 +1,4 @@
 ---
 
 authorized_keys: []
-disable_ssh_passwords: false
+disable_ssh_passwords: False
