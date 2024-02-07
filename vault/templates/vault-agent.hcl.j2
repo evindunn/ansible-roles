@@ -1,0 +1,41 @@
+pid_file = "/run/vault/vault.pid"
+
+vault {
+  address = "{{ vault_addr }}"
+  tls_skip_verify = true
+}
+
+auto_auth {
+  method {
+    type = "approle"
+
+    config = {
+      role_id_file_path = "/etc/vault.d/.role-id"
+    }
+  }
+}
+
+api_proxy {
+  use_auto_auth_token = true
+}
+
+cache {
+  // An empty cache stanza still enables caching
+}
+
+listener "unix" {
+  address = "/run/vault/vault.sock"
+  tls_disable = true
+}
+
+{#
+template {
+  source = "/etc/vault/server.key.ctmpl"
+  destination = "/etc/vault/server.key"
+}
+
+template {
+  source = "/etc/vault/server.crt.ctmpl"
+  destination = "/etc/vault/server.crt"
+}
+#}

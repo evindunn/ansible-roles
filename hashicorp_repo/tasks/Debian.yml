@@ -3,19 +3,29 @@
 - include_vars: "{{ ansible_os_family }}.yml"
 
 - name: make sure gnupg2 is installed
-  package:
+  ansible.builtin.apt:
     name: gnupg2
-    state: present
+    cache_valid_time: 3600
 
-- name: Add the hashicorp gpg key
-  apt_key:
-    url: "{{ hashicorp_gpg_key }}"
-    keyring: "{{ hashicorp_gpg_keyring }}"
-    state: present
+- name: Convert the hashicorp gpg key
+  ansible.builtin.shell: "wget -O- {{ hashicorp_gpg_key }} | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/hashicorp-archive-keyring.gpg"
+  args:
+    creates: /etc/apt/trusted.gpg.d/hashicorp-archive-keyring.gpg
+
+- name: Stat the gpg key
+  ansible.builtin.stat:
+    path: /etc/apt/trusted.gpg.d/hashicorp-archive-keyring.gpg
+    checksum_algorithm: sha256
+  register: hashi_gpg_checksum_actual
+
+- name: Verify the hashicorp gpg key
+  ansible.builtin.assert:
+    that: hashi_gpg_checksum_actual.stat.checksum == hashicorp_gpg_key_checksum
+    fail_msg: "Invalid sha256sum for {{ hashicorp_gpg_key }}"
 
 - name: Add the hashicorp repo
-  apt_repository:
-    repo: 'deb [signed-by="{{ hashicorp_gpg_keyring }}"] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main'
+  ansible.builtin.apt_repository:
+    repo: 'deb [signed-by="/etc/apt/trusted.gpg.d/hashicorp-archive-keyring.gpg"] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main'
     state: present
+    filename: vault
     update_cache: true
-

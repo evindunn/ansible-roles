@@ -1,4 +1,4 @@
 ---
 
 hashicorp_gpg_key: https://apt.releases.hashicorp.com/gpg
-hashicorp_gpg_keyring: /etc/apt/trusted.gpg.d/hashicorp.gpg
+hashicorp_gpg_key_checksum: 801d1c66a9076c9990fac4bcf90f649e273cb36c6a212981b145404fcdb57ad1

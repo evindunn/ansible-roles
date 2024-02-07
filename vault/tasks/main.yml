@@ -1,20 +1,89 @@
 ---
 
 - name: Install vault
-  package:
+  ansible.builtin.package:
     name: vault
     state: present
 
 - name: Configure the vault server
-  lineinfile:
-    path: /etc/profile.d/vault.sh
-    create: true
+  ansible.builtin.copy:
+    content: |
+      #!/bin/bash
+      export VAULT_ADDR=https://127.0.0.1:8200
+    dest: /etc/profile.d/vault.sh
     mode: "0755"
-    line: "export VAULT_ADDR={{ vault_addr }}"
-    regexp: "export VAULT_ADDR=.*"
+  when: vault_server
 
 - name: Configure vault daemon
-  service:
+  ansible.builtin.service:
     name: vault
     state: "{{ 'started' if vault_server else 'stopped' }}"
     enabled: "{{ vault_server }}"
+
+- when: not vault_server and vault_approle_id != ""
+  block:
+    - name: Configure vault run directory
+      ansible.builtin.copy:
+        content: |
+          d /run/vault 0750 vault vault
+        dest: /etc/tmpfiles.d/vault.conf
+        mode: "0644"
+      register: vault_tmpfiles_d
+
+    - name: Reload systemd-tmpfiles
+      ansible.builtin.shell: systemd-tmpfiles --create
+      when: vault_tmpfiles_d.changed
+
+    - name: Find all vault config files
+      ansible.builtin.find:
+        paths: /etc/vault.d
+        excludes: 
+          - .role-id
+          - agent.hcl
+        recurse: True
+      register: vault_extra_cfgs
+
+    - name: Remove all vault config files
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ vault_extra_cfgs.files }}"
+
+    - name: Write approle id
+      ansible.builtin.copy:
+        content: "{{ vault_approle_id }}"
+        dest: /etc/vault.d/.role-id
+        owner: vault
+        group: vault
+        mode: "0600"
+      register: vault_approle_id
+
+    - name: Configure vault agent
+      ansible.builtin.template:
+        src: vault-agent.hcl.j2
+        dest: /etc/vault.d/agent.hcl
+        owner: vault
+        group: vault
+        mode: "0600"
+      register: vault_agent_cfg
+
+    - name: Write vault-agent systemd unit
+      ansible.builtin.copy:
+        src: vault-agent.service
+        dest: /usr/lib/systemd/system/vault-agent.service
+      register: vault_agent_service
+
+    - name: Reload systemd units
+      ansible.builtin.systemd:
+        name: vault-agent
+        state: "{{ 'reloaded' if vault_approle_id.changed or vault_agent_cfg.changed else 'started' }}"
+        enabled: True
+        daemon_reload: "{{ vault_agent_service.changed }}"
+
+    - name: Configure the vault server
+      ansible.builtin.copy:
+        content: |
+          #!/bin/bash
+          export VAULT_ADDR=unix:///run/vault/vault.sock
+        dest: /etc/profile.d/vault.sh
+        mode: "0755"
