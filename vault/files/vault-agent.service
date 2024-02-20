@@ -12,11 +12,11 @@ Group=vault
 ProtectSystem=full
 ProtectHome=read-only
 PrivateTmp=yes
-PrivateDevices=yes
+#PrivateDevices=yes
 SecureBits=keep-caps
-AmbientCapabilities=CAP_IPC_LOCK
-CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
-NoNewPrivileges=yes
+AmbientCapabilities=CAP_IPC_LOCK CAP_SETUID CAP_SETGID CAP_AUDIT_WRITE
+CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK CAP_SETUID CAP_SETGID CAP_AUDIT_WRITE
+#NoNewPrivileges=yes
 ExecStart=/usr/bin/vault agent -config=/etc/vault.d/agent.hcl
 ExecReload=/bin/kill --signal HUP $MAINPID
 KillMode=process
