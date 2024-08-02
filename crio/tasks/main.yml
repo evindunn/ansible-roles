@@ -29,31 +29,29 @@
     state: mounted
     fstype: ext4
     opts: noatime
+  when: crio_volume is defined
 
-- name: Set cri-o OS version
-  set_fact:
-    crio_os: "x{{ ansible_distribution }}_{{ ansible_distribution_version }}"
+- name: add the cri-o key
+  get_url:
+    url: "https://pkgs.k8s.io/addons:/cri-o:/stable:/v{{ crio_version }}/deb/Release.key"
+    dest: /tmp/crio.key
+  register: crio_gpg_dl
 
-- name: Configure cri-o repos
-  template:
-    src: crio-repos.list
-    dest: /etc/apt/sources.list.d/crio.list
+- name: dearmor the gpg key
+  shell: cat /tmp/crio.key | gpg --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
+  when: crio_gpg_dl.changed
 
-- name: Add cri-o apt keys
-  apt_key:
-    url: "{{ item }}"
-  loop:
-    - https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ crio_os }}/Release.key
-    - https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:{{ crio_version }}/{{ crio_os }}/Release.key
+- name: add the cri-o repo
+  apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://pkgs.k8s.io/addons:/cri-o:/stable:/v{{ crio_version }}/deb/ /"
+    filename: cri-o
+  register: crio_repo_file
 
 - name: Install cri-o
   apt:
-    name: "{{ item }}"
+    name: cri-o
     state: latest
-    update_cache: yes
-  loop:
-    - cri-o
-    - cri-o-runc
+    update_cache: "{{ crio_gpg_dl.changed or crio_repo_file.changed }}"
 
 - name: Make sure cri-o is started/enabled
   service:
