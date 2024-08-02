@@ -1,1 +1,2 @@
-timezone: America/Phoenix
+timezone: America/New_York
+ntp_server: pool.ntp.org

@@ -1,2 +1,19 @@
 ---
 
+- name: configure the ntp server
+  lineinfile:
+    path: /etc/systemd/timesyncd.conf
+    regexp: '^#?\s*NTP='
+    insertafter: "[NTP]"
+    line: "NTP={{ ntp_server }}"
+  notify: restart timesyncd
+
+- name: check if ntp is enabled
+  shell: "timedatectl status | grep -F 'NTP service: active'"
+  changed_when: False
+  failed_when: False
+  register: ntp_enabled
+
+- name: enable ntp
+  shell: "timedatectl set-ntp true"
+  when: ntp_enabled.rc != 0
