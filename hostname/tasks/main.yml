@@ -1,7 +1,7 @@
 ---
 - name: Look up dns hostname
   set_fact:
-    set_hostname: "{{ lookup('dig', '{{ ansible_default_ipv4.address }}/PTR') }}"
+    set_hostname: "{{ lookup('dig', '{{ ansible_default_ipv4.address }}/PTR', fail_on_error=False) }}"
 
 - when: set_hostname not in ['NXDOMAIN', '']
   block:

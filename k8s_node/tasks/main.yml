@@ -8,16 +8,16 @@
 - name: add the k8s key
   get_url:
     url: "https://pkgs.k8s.io/core:/stable:/v{{ k8s_version }}/deb/Release.key"
-    dest: /tmp/k8s.key
+    dest: /usr/share/keyrings/pkgs.k8s.io_Release.key
   register: k8s_gpg_dl
 
 - name: dearmor the gpg key
-  shell: cat /tmp/k8s.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+  shell: cat /usr/share/keyrings/pkgs.k8s.io_Release.key | gpg --dearmor -o /usr/share/keyrings/kubernetes-apt-keyring.gpg
   when: k8s_gpg_dl.changed
 
 - name: add the k8s repo
   apt_repository:
-    repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v{{ k8s_version }}/deb/ /"
+    repo: "deb [signed-by=/usr/share/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v{{ k8s_version }}/deb/ /"
     filename: kubernetes
   register: k8s_repo_file
 

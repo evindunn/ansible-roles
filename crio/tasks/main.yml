@@ -34,16 +34,16 @@
 - name: add the cri-o key
   get_url:
     url: "https://pkgs.k8s.io/addons:/cri-o:/stable:/v{{ crio_version }}/deb/Release.key"
-    dest: /tmp/crio.key
+    dest: /usr/share/keyrings/cri-o-apt-keyring.key
   register: crio_gpg_dl
 
 - name: dearmor the gpg key
-  shell: cat /tmp/crio.key | gpg --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
+  shell: cat /usr/share/keyrings/cri-o-apt-keyring.key | gpg --dearmor -o /usr/share/keyrings/cri-o-apt-keyring.gpg
   when: crio_gpg_dl.changed
 
 - name: add the cri-o repo
   apt_repository:
-    repo: "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://pkgs.k8s.io/addons:/cri-o:/stable:/v{{ crio_version }}/deb/ /"
+    repo: "deb [signed-by=/usr/share/keyrings/cri-o-apt-keyring.gpg] https://pkgs.k8s.io/addons:/cri-o:/stable:/v{{ crio_version }}/deb/ /"
     filename: cri-o
   register: crio_repo_file
 
