@@ -18,4 +18,4 @@
       lineinfile:
         path: /etc/hosts
         regexp: '127\.0\.1\.1.*'
-        line: "127.0.1.1 {{ set_hostname_short }} {{ set_hostname }}"
+        line: "127.0.1.1 {{ set_hostname }} {{ set_hostname_short }}"
