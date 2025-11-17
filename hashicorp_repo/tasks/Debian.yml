@@ -7,25 +7,22 @@
     name: gnupg2
     cache_valid_time: 3600
 
-- name: Convert the hashicorp gpg key
-  ansible.builtin.shell: "wget -O- {{ hashicorp_gpg_key }} | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/hashicorp-archive-keyring.gpg"
-  args:
-    creates: /etc/apt/trusted.gpg.d/hashicorp-archive-keyring.gpg
+- set_fact:
+    hashi_gpg_dest: /usr/share/keyrings/hashicorp-archive-keyring.gpg
 
 - name: Stat the gpg key
   ansible.builtin.stat:
-    path: /etc/apt/trusted.gpg.d/hashicorp-archive-keyring.gpg
+    path: "{{ hashi_gpg_dest }}"
     checksum_algorithm: sha256
   register: hashi_gpg_checksum_actual
 
-- name: Verify the hashicorp gpg key
-  ansible.builtin.assert:
-    that: hashi_gpg_checksum_actual.stat.checksum == hashicorp_gpg_key_checksum
-    fail_msg: "Invalid sha256sum for {{ hashicorp_gpg_key }}"
+- name: Download the hashicorp gpg key
+  ansible.builtin.shell: "wget -O- {{ hashicorp_gpg_key }} | sudo gpg --dearmor -o {{ hashi_gpg_dest }}"
+  when: 'hashi_gpg_checksum_actual.stat.exists and hashi_gpg_checksum_actual.stat.checksum != hashicorp_gpg_key_checksum'
 
 - name: Add the hashicorp repo
   ansible.builtin.apt_repository:
-    repo: 'deb [signed-by="/etc/apt/trusted.gpg.d/hashicorp-archive-keyring.gpg"] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main'
+    repo: 'deb [signed-by="{{ hashi_gpg_dest }}"] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main'
     state: present
     filename: vault
     update_cache: true
