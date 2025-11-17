@@ -1,0 +1,4 @@
+---
+
+samba_exporter_gpg_key: 'https://imker25.github.io/samba_exporter/repos/debian/archive.key'
+samba_exporter_gpg_key_checksum: '304d301a5b7ca2bede3ae7a9c444e0bd912be2448331591c72668865f0b075ce'

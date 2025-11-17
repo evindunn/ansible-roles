@@ -1,0 +1,19 @@
+---
+
+- name: install samba
+  apt:
+    name: 
+      - samba
+      - gnupg2
+    cache_valid_time: 3600
+
+- name: start/enable samba
+  service:
+    name: smbd
+    enabled: True
+    state: started
+
+- when: ansible_local.custom.dpkg_architecture == 'amd64'
+  block:
+    - name: install samba-exporter
+      include_tasks: samba-exporter.yml

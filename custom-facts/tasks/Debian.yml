@@ -1,0 +1,11 @@
+---
+
+- name: determine dpkg architecture
+  shell: dpkg --print-architecture
+  changed_when: False
+  register: dpkg_arch
+
+- name: set dpkg_architecture fact
+  set_fact:
+    collected_facts: '{{ collected_facts | combine({"dpkg_architecture": dpkg_arch.stdout.strip()}) }}'
+

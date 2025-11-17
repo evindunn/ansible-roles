@@ -1,0 +1,36 @@
+---
+
+- set_fact:
+    samba_exporter_gpg_dest: /usr/share/keyrings/samba-exporter.gpg
+
+- name: Stat the gpg key
+  ansible.builtin.stat:
+    path: "{{ samba_exporter_gpg_dest }}"
+    checksum_algorithm: sha256
+  register: samba_exporter_gpg_checksum_actual
+
+- name: Download the samba-exporter gpg key
+  ansible.builtin.shell: "wget -O- {{ samba_exporter_gpg_key }} | sudo gpg --dearmor -o {{ samba_exporter_gpg_dest }}"
+  when: 'not samba_exporter_gpg_checksum_actual.stat.exists or samba_exporter_gpg_checksum_actual.stat.checksum != samba_exporter_gpg_key_checksum'
+
+- name: Add the samba-exporter repo
+  ansible.builtin.apt_repository:
+    repo: 'deb [signed-by="{{ samba_exporter_gpg_dest }}"] https://imker25.github.io/samba_exporter/repos/debian {{ ansible_distribution_release }} main'
+    state: present
+    filename: samba-exporter
+    update_cache: true
+
+- name: Install samba-exporter
+  apt:
+    name: samba-exporter
+    cache_valid_time: 3600
+
+- name: Start/enable samba-exporter
+  service:
+    name: '{{ item }}'
+    enabled: True
+    state: started
+  loop:
+    - samba_statusd
+    - samba_exporter
+

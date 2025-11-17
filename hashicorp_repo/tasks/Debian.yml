@@ -18,7 +18,7 @@
 
 - name: Download the hashicorp gpg key
   ansible.builtin.shell: "wget -O- {{ hashicorp_gpg_key }} | sudo gpg --dearmor -o {{ hashi_gpg_dest }}"
-  when: 'hashi_gpg_checksum_actual.stat.exists and hashi_gpg_checksum_actual.stat.checksum != hashicorp_gpg_key_checksum'
+  when: 'not hashi_gpg_checksum_actual.stat.exists or hashi_gpg_checksum_actual.stat.checksum != hashicorp_gpg_key_checksum'
 
 - name: Add the hashicorp repo
   ansible.builtin.apt_repository:
