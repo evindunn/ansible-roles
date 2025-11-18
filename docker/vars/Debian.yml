@@ -5,7 +5,6 @@ docker_deps:
   - ca-certificates
   - curl
   - gnupg2
-  - software-properties-common
   - uidmap
 
 systemd_mount_flags: "shared"

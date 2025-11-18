@@ -1,5 +1,7 @@
 ---
 
+docker_gpg_key_checksum: a09e26b72228e330d55bf134b8eaca57365ef44bf70b8e27c5f55ea87a8b05e2
+
 docker_pkgs:
   - docker-ce 
   - docker-ce-cli 

@@ -1,28 +1,22 @@
-- name: check if we've imported the docker gpg key
-  stat:
-    path: /etc/apt/trusted.gpg.d/docker.gpg
-  register: docker_gpg
+---
 
-- when: not docker_gpg.stat.exists or force_import_gpg | default(False)
-  block:
-    - name: download the docker APT key
-      get_url:
-        url: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
-        dest: /tmp/docker.asc
+- set_fact:
+    docker_gpg_dest: /usr/share/keyrings/docker.gpg
 
-    - name: import the docker apt key
-      shell: gpg --dearmor -o /etc/apt/trusted.gpg.d/docker.gpg --yes /tmp/docker.asc
+- name: Stat the gpg key
+  ansible.builtin.stat:
+    path: "{{ docker_gpg_dest }}"
+    checksum_algorithm: sha256
+  register: docker_gpg_checksum_actual
 
-    - name: remove the downloaded apt key
-      file:
-        path: /tmp/docker.asc
-        state: absent
-
-- name: Determine the CPU architecture for apt
-  shell: dpkg --print-architecture
-  changed_when: false
-  register: cpu_arch
+- name: Download the docker gpg key
+  ansible.builtin.shell: "wget -O- https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg | sudo gpg --dearmor -o {{ docker_gpg_dest }}"
+  when: 'not docker_gpg_checksum_actual.stat.exists or docker_gpg_checksum_actual.stat.checksum != docker_gpg_key_checksum'
 
 - name: Add the docker repo
-  apt_repository:
-    repo: "deb [arch={{ cpu_arch.stdout.strip() }} signed-by=/etc/apt/trusted.gpg.d/docker.gpg] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"
+  ansible.builtin.apt_repository:
+    repo: 'deb [signed-by="{{ docker_gpg_dest }}"] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} main'
+    state: present
+    filename: docker
+    update_cache: true
+
