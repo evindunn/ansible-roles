@@ -8,7 +8,6 @@
 
 - name: Add the nginx repo
   apt_repository:
-    repo: 'deb [signed-by="{{ nginx_gpg_keyring }}"] https://nginx.org/packages/{{ ansible_distribution | lower }}/ {{ ansible_distribution_release }} nginx'
+    repo: "deb [signed-by='{{ nginx_gpg_keyring }}'] https://nginx.org/packages/{{ ansible_facts['distribution'] | lower }}/ {{ ansible_facts['distribution_release'] }} nginx"
     filename: nginx
     state: present
-

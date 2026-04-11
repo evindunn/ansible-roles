@@ -1,4 +1,4 @@
-- include_vars: "{{ ansible_os_family }}.yml"
+- include_vars: "{{ ansible_facts['os_family'] }}.yml"
 
 - name: Install locales
   package:
@@ -22,7 +22,7 @@
     path: "{{ item.path }}"
     line: 'LANG="{{ locale }}"'
     regexp: "LANG=.*"
-  when: ansible_os_family == item.os
+  when: ansible_facts["os_family"] == item.os
   loop:
     - os: Debian
       path: /etc/default/locale
@@ -38,7 +38,7 @@
     regexp: "XKBLAYOUT=.*"
     create: true
   notify: Reboot
-  when: ansible_os_family == "Debian"
+  when: ansible_facts["os_family"] == "Debian"
   
 - name: Set the keyboard layout (RedHat)
   lineinfile:
@@ -46,4 +46,4 @@
     line: 'KEYMAP="{{ keyboard_layout }}"'
     regexp: "KEYMAP=.*"
   notify: Reboot
-  when: ansible_os_family == "RedHat"
+  when: ansible_facts["os_family"] == "RedHat"

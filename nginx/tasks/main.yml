@@ -1,11 +1,10 @@
 ---
 
 - name: include os-specific tasks
-  include_tasks: "{{ ansible_os_family }}.yml"
+  include_tasks: "{{ ansible_facts['os_family'] }}.yml"
 
 - name: install packages
   package:
     name: nginx
     state: present
   notify: enable/start nginx
-

@@ -4,7 +4,7 @@
   set_fact:
     collected_facts: {}
 
-- include_tasks: "{{ ansible_os_family }}.yml"
+- include_tasks: "{{ ansible_facts['os_family'] }}.yml"
 
 - name: create custom facts directory
   file:

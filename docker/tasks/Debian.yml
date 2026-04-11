@@ -10,13 +10,17 @@
   register: docker_gpg_checksum_actual
 
 - name: Download the docker gpg key
-  ansible.builtin.shell: "wget -O- https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg | sudo gpg --dearmor -o {{ docker_gpg_dest }}"
+  ansible.builtin.shell: "wget -O- https://download.docker.com/linux/{{ ansible_facts['distribution'] | lower }}/gpg | gpg --dearmor -o {{ docker_gpg_dest }}"
   when: 'not docker_gpg_checksum_actual.stat.exists or docker_gpg_checksum_actual.stat.checksum != docker_gpg_key_checksum'
 
 - name: Add the docker repo
-  ansible.builtin.apt_repository:
-    repo: 'deb [signed-by="{{ docker_gpg_dest }}"] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} main'
-    state: present
-    filename: docker
-    update_cache: true
+  ansible.builtin.template:
+    src: docker.sources
+    dest: /etc/apt/sources.list.d/docker.sources
+    mode: '0644'
+  register: docker_repo
 
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+  when: docker_repo.changed

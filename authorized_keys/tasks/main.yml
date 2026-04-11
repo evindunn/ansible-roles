@@ -1,7 +1,7 @@
 ---
 
 - name: Add authorized_keys
-  authorized_key:
+  ansible.posix.authorized_key:
     user: "{{ item.user }}"
     state: "{{ item.state | default('present') }}"
     key: "{{ item.key }}"

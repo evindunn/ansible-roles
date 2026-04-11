@@ -1,7 +1,7 @@
 ---
 
 - name: include os-specific variables
-  include_vars: "{{ ansible_os_family }}.yml"
+  include_vars: "{{ ansible_facts['os_family'] }}.yml"
 
 - name: install dependencies
   package:
@@ -9,7 +9,7 @@
     state: present
 
 - name: Include OS-specific tasks
-  include_tasks: "{{ ansible_os_family }}.yml"
+  include_tasks: "{{ ansible_facts['os_family'] }}.yml"
 
 - name: Install docker
   package:
@@ -21,7 +21,7 @@
     name: "{{ item }}"
     selection: hold
   loop: "{{ docker_pkgs }}"
-  when: ansible_os_family == "Debian"
+  when: ansible_facts["os_family"] == "Debian"
 
 - block:
   - name: Make sure dnf versionlock is installed
@@ -34,7 +34,7 @@
     loop: "{{ docker_pkgs }}"
     changed_when: false
 
-  when: ansible_os_family == "RedHat"
+  when: ansible_facts["os_family"] == "RedHat"
 
 - name: make sure the docker config directory exists
   file:
@@ -71,10 +71,3 @@
     name: docker
     enabled: yes
     state: started
-
-- name: add users to docker group
-  ansible.builtin.user:
-    name: "{{ item }}"
-    groups: docker
-    append: True
-  loop: "{{ docker_users }}"

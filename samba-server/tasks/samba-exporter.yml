@@ -15,7 +15,7 @@
 
 - name: Add the samba-exporter repo
   ansible.builtin.apt_repository:
-    repo: 'deb [signed-by="{{ samba_exporter_gpg_dest }}"] https://imker25.github.io/samba_exporter/repos/debian {{ ansible_distribution_release }} main'
+    repo: "deb [signed-by='{{ samba_exporter_gpg_dest }}'] https://imker25.github.io/samba_exporter/repos/debian {{ ansible_facts['distribution_release'] }} main"
     state: present
     filename: samba-exporter
     update_cache: true
@@ -33,4 +33,3 @@
   loop:
     - samba_statusd
     - samba_exporter
-

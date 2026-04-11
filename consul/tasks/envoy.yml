@@ -2,8 +2,8 @@
 
 - name: set the machine architecture
   set_fact:
-    envoy_arch: "{{ 'amd64' if ansible_architecture == 'x86_64' else 'arm64' }}"
-  when: "ansible_architecture in ['aarch64', 'x86_64']"
+    envoy_arch: "{{ 'amd64' if ansible_facts['architecture'] == 'x86_64' else 'arm64' }}"
+  when: "ansible_facts['architecture'] in ['aarch64', 'x86_64']"
 
 - name: make sure curl is installed
   package:
@@ -39,4 +39,3 @@
     dest: "/usr/local/bin/envoy"
     mode: "0755"
     remote_src: true
-

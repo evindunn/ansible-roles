@@ -9,5 +9,3 @@ docker_daemon_opts:
   log-driver: json-file
   log-opts:
     max-size: 100m
-
-docker_users: []

@@ -1,8 +1,8 @@
 - name: include os-specific variables
-  include_vars: "{{ ansible_os_family }}.yml"
+  include_vars: "{{ ansible_facts['os_family'] }}.yml"
 
 - name: include os-specific tasks
-  include_tasks: "{{ ansible_os_family }}.yml"
+  include_tasks: "{{ ansible_facts['os_family'] }}.yml"
 
 - name: make sure timesyncd is enabled/running
   service:
@@ -18,4 +18,3 @@
 - name: set the timezone
   shell: "timedatectl set-timezone '{{ timezone }}'"
   when: current_timezone.stdout != timezone
-

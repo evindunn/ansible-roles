@@ -15,8 +15,8 @@
 
     - name: set the machine architecture
       set_fact:
-        consul_templ_arch: "{{ 'amd64' if ansible_architecture == 'x86_64' else 'arm64' }}"
-      when: "ansible_architecture in ['aarch64', 'x86_64']"
+        consul_templ_arch: "{{ 'amd64' if ansible_facts['architecture'] == 'x86_64' else 'arm64' }}"
+      when: "ansible_facts['architecture'] in ['aarch64', 'x86_64']"
 
     - name: Install consul-template
       unarchive:
@@ -73,4 +73,3 @@
 - name: include the envoy installation
   import_tasks: envoy.yml
   tags: envoy
-
