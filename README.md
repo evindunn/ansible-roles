@@ -35,6 +35,10 @@ Collection of ansible roles that I've written for the homelab
 | [vim](vim/) | Installs Vim and deploys a global vimrc. |
 <!-- role-table:end -->
 
+## Helper Scripts
+
+- [create_role.py](create_role.py) creates a new dummy role from built-in templates.
+- [update_readme.py](update_readme.py) rebuilds the generated role table from each role README's title and first paragraph.
 
 ### Setup
 

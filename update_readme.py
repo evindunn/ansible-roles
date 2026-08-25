@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """Update the top-level README role summary table."""
 
 import pathlib
