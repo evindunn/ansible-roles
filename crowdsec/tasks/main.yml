@@ -1,0 +1,42 @@
+---
+
+- name: Download the CrowdSec install script
+  ansible.builtin.get_url:
+    url: https://install.crowdsec.net
+    dest: /var/tmp/crowdsec-install.sh
+    mode: '0755'
+  delegate_to: localhost
+  run_once: true
+  become: false
+
+- name: Copy the CrowdSec install script
+  ansible.builtin.copy:
+    src: /var/tmp/crowdsec-install.sh
+    dest: /var/tmp/crowdsec-install.sh
+    mode: '0755'
+
+- name: Run the CrowdSec install script
+  ansible.builtin.command: /bin/sh /var/tmp/crowdsec-install.sh
+  become: true
+
+- name: Install crowdsec
+  ansible.builtin.apt:
+    name:
+      - crowdsec
+      - crowdsec-firewall-bouncer-iptables
+    state: present
+
+- name: Start/enable crowdsec
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: started
+    enabled: True
+  loop:
+    - crowdsec
+    - crowdsec-firewall-bouncer
+
+- name: Install CrowdSec parsers
+  ansible.builtin.shell: "cscli parsers install {{ item }} 2>&1"
+  register: crowdsec_parser_install
+  changed_when: "'Nothing to install' not in crowdsec_parser_install.stdout"
+  loop: "{{ crowdsec_parsers }}"

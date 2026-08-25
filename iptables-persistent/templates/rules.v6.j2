@@ -1,0 +1,9 @@
+# {{ ansible_managed }}
+*filter
+{% for chain, policy in iptables_persistent_ipv6_default_policies.items() %}
+:{{ chain }} {{ policy }} [0:0]
+{% endfor %}
+{% for rule in iptables_persistent_ipv6_rules %}
+{{ rule }}
+{% endfor %}
+COMMIT

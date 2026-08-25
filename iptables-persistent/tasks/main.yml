@@ -1,0 +1,43 @@
+---
+
+- name: Disable iptables-persistent install-time save prompts
+  ansible.builtin.debconf:
+    name: iptables-persistent
+    question: "{{ item }}"
+    value: 'false'
+    vtype: boolean
+  loop:
+    - iptables-persistent/autosave_v4
+    - iptables-persistent/autosave_v6
+
+- name: Make sure iptables-persistent is installed
+  ansible.builtin.package:
+    name: iptables-persistent
+    state: present
+
+- name: Create the iptables configuration directory
+  ansible.builtin.file:
+    path: /etc/iptables
+    state: directory
+    mode: '0755'
+
+- name: Render IPv4 iptables rules
+  ansible.builtin.template:
+    src: rules.v4.j2
+    dest: /etc/iptables/rules.v4
+    mode: '0644'
+  notify: Reload netfilter-persistent
+
+- name: Render IPv6 iptables rules
+  ansible.builtin.template:
+    src: rules.v6.j2
+    dest: /etc/iptables/rules.v6
+    mode: '0644'
+  notify: Reload netfilter-persistent
+
+- name: Force restart netfilter-persistent
+  debug:
+    msg: "netfilter-persistent will be restarted"
+  when: iptables_persistent_force_restart | bool
+  changed_when: True
+  notify: Reload netfilter-persistent

@@ -1,0 +1,16 @@
+---
+
+iptables_persistent_rules: []
+
+iptables_persistent_ipv4_rules: "{{ iptables_persistent_rules }}"
+iptables_persistent_ipv6_rules: "{{ iptables_persistent_rules }}"
+
+iptables_persistent_default_policies:
+  INPUT: ACCEPT
+  FORWARD: ACCEPT
+  OUTPUT: ACCEPT
+
+iptables_persistent_ipv4_default_policies: "{{ iptables_persistent_default_policies }}"
+iptables_persistent_ipv6_default_policies: "{{ iptables_persistent_default_policies }}"
+
+iptables_persistent_force_restart: false
