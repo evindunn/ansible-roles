@@ -2,11 +2,14 @@
 
 Adds the upstream PostgreSQL apt repository and signing key.
 
-## How It Works
+## Example
 
-The role installs `gnupg2`, imports the PostgreSQL signing key into `postgres_gpg_keyring`, and adds the PostgreSQL Global Development Group apt repository for the host distribution release.
-
-Use this role before PostgreSQL client or server roles when you need versions from the upstream repository.
+```yml
+- hosts: postgres_hosts
+  roles:
+    - role: postgres-common
+      postgres_gpg_keyring: /etc/apt/trusted.gpg.d/postgres.gpg
+```
 
 ## Defaults
 

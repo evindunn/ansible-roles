@@ -2,11 +2,17 @@
 
 Manages SSH authorized keys and optionally disables password authentication.
 
-## How It Works
+## Example
 
-The role loops over `authorized_keys` and applies each entry with `ansible.posix.authorized_key` when both `user` and `key` are set. Each entry may also set `state`, which defaults to `present`.
-
-It updates `PasswordAuthentication` in `/etc/ssh/sshd_config` from `disable_ssh_passwords` and notifies the SSH daemon reload handler when that setting changes.
+```yml
+- hosts: servers
+  roles:
+    - role: authorized_keys
+      disable_ssh_passwords: true
+      authorized_keys:
+        - user: deploy
+          key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA..."
+```
 
 ## Defaults
 

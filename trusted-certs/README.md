@@ -2,11 +2,16 @@
 
 Installs additional trusted certificate authorities and refreshes the system trust store.
 
-## How It Works
+## Example
 
-The role loads OS-family variables, ensures `ca-certificates` is installed, and copies each file listed in `trusted_certs` into the platform certificate directory.
-
-When any certificate changes, it runs the OS-specific certificate update command.
+```yml
+- hosts: servers
+  roles:
+    - role: trusted-certs
+      trusted_certs:
+        - internal-root-ca.crt
+        - internal-issuing-ca.crt
+```
 
 ## Defaults
 

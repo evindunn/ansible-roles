@@ -2,11 +2,15 @@
 
 Configures kernel prerequisites, the upstream CRI-O apt repository, and the CRI-O service.
 
-## How It Works
+## Example
 
-The role installs `lvm2`, templates module-load configuration, loads required kernel modules, and applies CRI-O networking sysctls. If `crio_volume` is defined, it mounts that volume at `/var/lib/containers/storage`.
-
-It downloads and dearmors the Kubernetes CRI-O repository key, adds the CRI-O apt repository for `crio_version`, installs `cri-o`, and starts/enables the `crio` service.
+```yml
+- hosts: k8s_nodes
+  roles:
+    - role: crio
+      crio_version: "1.30"
+      crio_volume: /dev/disk/by-label/crio
+```
 
 ## Defaults
 

@@ -39,7 +39,7 @@ when rules contain address-family-specific values.
 default. Use `iptables_persistent_ipv4_default_policies` or
 `iptables_persistent_ipv6_default_policies` when policies differ by family.
 
-## Examples
+## Example
 
 ```yml
 iptables_persistent_ipv4_default_policies:

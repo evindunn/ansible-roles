@@ -2,11 +2,15 @@
 
 Installs Vim and deploys a global vimrc.
 
-## How It Works
+## Example
 
-The role loads OS-family variables, installs each package in `pkgs`, and copies the bundled `vimrc` to the OS-specific `vimrc_path`.
-
-Use OS-family vars to adjust package names or the destination path for different distributions.
+```yml
+- hosts: servers
+  roles:
+    - role: vim
+      pkgs:
+        - vim
+```
 
 ## Defaults
 

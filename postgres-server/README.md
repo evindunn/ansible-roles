@@ -2,11 +2,16 @@
 
 Installs the PostgreSQL server package for a selected major version.
 
-## How It Works
+## Example
 
-The role installs `postgresql-{{ postgres_version }}` with the system package manager.
+```yml
+- hosts: database
+  roles:
+    - role: postgres-common
 
-Use `postgres-common` first when the host needs the upstream PostgreSQL repository configured.
+    - role: postgres-server
+      postgres_version: 14
+```
 
 ## Defaults
 

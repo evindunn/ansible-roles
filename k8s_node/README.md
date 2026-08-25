@@ -2,11 +2,16 @@
 
 Installs Kubernetes node packages from the upstream apt repository and disables swap.
 
-## How It Works
+## Example
 
-The role installs apt prerequisites, downloads and dearmors the Kubernetes package key, adds the repository for `k8s_version`, and installs `kubelet`, `kubeadm`, and `kubectl`.
+```yml
+- hosts: k8s_nodes
+  roles:
+    - role: crio
 
-If swap is active, it runs `swapoff -a` and removes swap entries from `/etc/fstab`.
+    - role: k8s_node
+      k8s_version: "1.30"
+```
 
 ## Defaults
 
