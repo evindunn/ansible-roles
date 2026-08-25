@@ -40,6 +40,10 @@ Collection of ansible roles that I've written for the homelab
 - [create_role.py](create_role.py) creates a new dummy role from built-in templates.
 - [update_readme.py](update_readme.py) rebuilds the generated role table from each role README's title and first paragraph.
 
+## CI
+
+- [update-readme.yml](.github/workflows/update-readme.yml) refreshes the generated role table on pushes to the default branch.
+
 ### Setup
 
 Create a local virtualenv:
