@@ -17,6 +17,7 @@ iptables_persistent_default_policies:
 
 iptables_persistent_ipv4_default_policies: "{{ iptables_persistent_default_policies }}"
 iptables_persistent_ipv6_default_policies: "{{ iptables_persistent_default_policies }}"
+iptables_persistent_force_restart: false
 ```
 
 ## Rule Format
