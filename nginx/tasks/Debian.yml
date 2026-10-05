@@ -1,5 +1,22 @@
 ---
 
+- name: Create NEEDRESTART configuration directory
+  ansible.builtin.file:
+    path: /etc/needrestart/conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Disable Nginx restarts in NEEDRESTART
+  ansible.builtin.copy:
+    dest: /etc/needrestart/conf.d/nginx.conf
+    content: |
+      $nrconf{override_rc}->{qr(^nginx(\.service)?$)} = 0;
+    owner: root
+    group: root
+    mode: '0644'
+
 - name: Add the nginx gpg key
   apt_key:
     url: http://nginx.org/keys/nginx_signing.key

@@ -2,6 +2,8 @@
 
 Installs pinned Docker packages, configures the daemon, and prevents package upgrades.
 
+On Debian-family systems, configures NEEDRESTART to skip automatic Docker restarts.
+
 ## Example
 
 ```yml
