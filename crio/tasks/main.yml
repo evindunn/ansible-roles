@@ -1,3 +1,4 @@
+---
 - name: Make sure lvm2 is installed
   package:
     name: lvm2
@@ -24,8 +25,8 @@
 
 - name: Mount the cri-o volume
   mount:
-    src: "{{ crio_volume }}" 
-    path: /var/lib/containers/storage # cri-o default
+    src: "{{ crio_volume }}"
+    path: /var/lib/containers/storage  # cri-o default
     state: mounted
     fstype: ext4
     opts: noatime

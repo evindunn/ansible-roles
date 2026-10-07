@@ -2,7 +2,7 @@
 
 - name: install dnf-automatic
   package:
-    name: 
+    name:
       - dnf-automatic
       - mailx
     state: present
@@ -16,4 +16,3 @@
   service:
     name: dnf-automatic.timer
     enabled: true
-

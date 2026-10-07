@@ -1,3 +1,4 @@
+---
 - include_vars: "{{ ansible_facts['os_family'] }}.yml"
 
 - name: Install locales
@@ -39,7 +40,7 @@
     create: true
   notify: Reboot
   when: ansible_facts["os_family"] == "Debian"
-  
+
 - name: Set the keyboard layout (RedHat)
   lineinfile:
     path: /etc/vconsole.conf

@@ -24,11 +24,11 @@
 
 - name: re-gather facts
   setup:
-    gather_subset: 
+    gather_subset:
       - '!all'
       - '!min'
       - local
   when: custom_facts_file.changed
-    
+
 - debug:
     msg: '{{ ansible_local }}'

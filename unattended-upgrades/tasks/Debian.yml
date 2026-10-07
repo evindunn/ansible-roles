@@ -3,7 +3,7 @@
 - name: install unattended-upgrades
   package:
     name:
-      - unattended-upgrades 
+      - unattended-upgrades
       - apt-listchanges
       - mailutils
     state: present

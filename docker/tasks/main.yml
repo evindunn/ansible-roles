@@ -44,15 +44,15 @@
   when: ansible_facts["os_family"] == "Debian"
 
 - block:
-  - name: Make sure dnf versionlock is installed
-    package:
-      name: dnf-command(versionlock)
-      state: present
+    - name: Make sure dnf versionlock is installed
+      package:
+        name: dnf-command(versionlock)
+        state: present
 
-  - name: Prevent docker upgrades (RedHat)
-    shell: "dnf versionlock add {{ item }}"
-    loop: "{{ docker_pkgs }}"
-    changed_when: false
+    - name: Prevent docker upgrades (RedHat)
+      shell: "dnf versionlock add {{ item }}"
+      loop: "{{ docker_pkgs }}"
+      changed_when: false
 
   when: ansible_facts["os_family"] == "RedHat"
 

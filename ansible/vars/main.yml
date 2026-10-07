@@ -4,4 +4,3 @@ install_ansible_version: "5.6.0"
 install_ansible_extra_pkgs:
   - boto3
   - dnspython
-

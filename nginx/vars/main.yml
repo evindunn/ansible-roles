@@ -1,4 +1,3 @@
 ---
 
 nginx_gpg_keyring: /etc/apt/trusted.gpg.d/nginx.gpg
-

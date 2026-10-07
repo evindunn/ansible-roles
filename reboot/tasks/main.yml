@@ -4,4 +4,3 @@
   reboot:
     connect_timeout: 180
   changed_when: False
-

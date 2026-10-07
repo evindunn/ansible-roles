@@ -9,4 +9,3 @@
   shell: "yum-config-manager --add-repo {{ hashicorp_repo }}"
   args:
     creates: /etc/yum.repos.d/hashicorp.repo
-

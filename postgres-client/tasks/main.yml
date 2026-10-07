@@ -4,4 +4,3 @@
   package:
     name: "postgresql-client-{{ postgres_version }}"
     state: present
-

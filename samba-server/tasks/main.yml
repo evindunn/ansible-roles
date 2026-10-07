@@ -2,7 +2,7 @@
 
 - name: install samba
   apt:
-    name: 
+    name:
       - samba
       - gnupg2
     cache_valid_time: 3600

@@ -37,7 +37,7 @@
     - name: Find all vault config files
       ansible.builtin.find:
         paths: /etc/vault.d
-        excludes: 
+        excludes:
           - .role-id
           - agent.hcl
         recurse: True

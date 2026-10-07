@@ -33,7 +33,7 @@
   block:
     - name: disable swap
       shell: swapoff -a
-  
+
     - name: remove swap from fstab
       lineinfile:
         regexp: '.*\s+swap\s+'

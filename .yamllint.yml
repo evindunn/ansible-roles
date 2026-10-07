@@ -1,0 +1,8 @@
+---
+extends: default
+
+rules:
+  # Ansible roles use yes/no booleans; GitHub Actions uses an "on" key.
+  truthy: disable
+  line-length:
+    max: 200

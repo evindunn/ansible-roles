@@ -29,6 +29,7 @@ Collection of ansible roles that I've written for the homelab
 | [reboot](reboot/) | Provides a simple reboot task for roles that notify or include host restarts. |
 | [samba-server](samba-server/) | Installs and starts Samba, with an optional Samba exporter on amd64 hosts. |
 | [trusted-certs](trusted-certs/) | Installs additional trusted certificate authorities and refreshes the system trust store. |
+| [trivy](trivy/) | Installs Trivy from the official Aqua Security apt repository and a mailx provider on Debian and Ubuntu. |
 | [unattended-upgrades](unattended-upgrades/) | Configures unattended package updates for Debian and RedHat families. |
 | [update](update/) | Runs operating-system-specific package update tasks. |
 | [vault](vault/) | Installs Vault and configures either a server service or an AppRole-backed Vault Agent. |
@@ -64,3 +65,22 @@ Install the Ansible Galaxy collections:
 ```bash
 ansible-galaxy collection install -r requirements.yml
 ```
+
+### Pre-commit
+
+Use Python 3.10 or newer for the local virtualenv. Install the development requirements and enable the
+yamllint commit hook:
+
+```bash
+pip install -r requirements-dev.txt
+pre-commit install --config .pre-commit-config.yml
+```
+
+Check all tracked YAML files before committing:
+
+```bash
+pre-commit run --config .pre-commit-config.yml --all-files
+```
+
+The hook uses the rules in [.yamllint.yml](.yamllint.yml). Pre-commit installs
+the pinned yamllint version in an isolated environment on its first run.
