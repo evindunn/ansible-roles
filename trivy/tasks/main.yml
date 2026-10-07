@@ -1,0 +1,13 @@
+---
+
+- name: Check that the operating system is supported
+  ansible.builtin.assert:
+    that:
+      - ansible_facts['os_family'] == 'Debian'
+    fail_msg: The Trivy role supports Debian and Ubuntu systems only.
+
+- name: Include Debian installation tasks
+  ansible.builtin.include_tasks: Debian.yml
+
+- name: Include daily scan configuration
+  ansible.builtin.include_tasks: scan.yml

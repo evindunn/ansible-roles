@@ -1,0 +1,6 @@
+---
+
+trivy_cron_hour: '3'
+trivy_cron_minute: '0'
+trivy_emails: []
+trivy_mail_package: bsd-mailx

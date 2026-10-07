@@ -1,0 +1,47 @@
+---
+
+- name: Install repository prerequisites
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - apt-transport-https
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Create the repository key directory
+  ansible.builtin.file:
+    path: /usr/share/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Download the Trivy repository signing key
+  ansible.builtin.get_url:
+    url: https://aquasecurity.github.io/trivy-repo/deb/public.key
+    dest: /usr/share/keyrings/trivy.asc
+    owner: root
+    group: root
+    mode: '0644'
+  register: trivy_signing_key
+
+- name: Add the Trivy repository
+  ansible.builtin.apt_repository:
+    repo: deb [signed-by=/usr/share/keyrings/trivy.asc] https://aquasecurity.github.io/trivy-repo/deb generic main
+    filename: trivy
+    state: present
+    update_cache: false
+  register: trivy_repository
+
+- name: Refresh the package cache when repository configuration changes
+  ansible.builtin.apt:
+    update_cache: true
+  when: trivy_signing_key.changed or trivy_repository.changed
+
+- name: Install Trivy and mailx
+  ansible.builtin.apt:
+    name:
+      - trivy
+      - "{{ trivy_mail_package }}"
+    state: present

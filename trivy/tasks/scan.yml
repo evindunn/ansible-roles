@@ -1,0 +1,52 @@
+---
+
+- name: Require a list of alert email addresses
+  ansible.builtin.assert:
+    that:
+      - trivy_emails is sequence and trivy_emails is not string and trivy_emails is not mapping
+      - trivy_emails | length > 0
+    fail_msg: Set trivy_emails to a nonempty list.
+
+- name: Validate alert email addresses
+  ansible.builtin.assert:
+    that:
+      - item is string
+      - item is match('^[^\s@-][^\s@]*@[^\s@]+$')
+    fail_msg: Each recipient must be an email address without spaces or a leading hyphen.
+  loop: "{{ trivy_emails }}"
+
+- name: Install cron
+  ansible.builtin.apt:
+    name: cron
+    state: present
+
+- name: Start and enable cron
+  ansible.builtin.service:
+    name: cron
+    enabled: true
+    state: started
+
+- name: Install the Trivy daily scan script
+  ansible.builtin.copy:
+    src: trivy-critical-scan.sh
+    dest: /usr/local/sbin/trivy-critical-scan
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Configure Trivy alert recipients
+  ansible.builtin.template:
+    src: trivy-scan.conf.j2
+    dest: /etc/trivy-scan.conf
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Schedule the daily critical CVE scan
+  ansible.builtin.cron:
+    name: Trivy daily critical CVE scan
+    cron_file: trivy-critical-scan
+    user: root
+    hour: "{{ trivy_cron_hour }}"
+    minute: "{{ trivy_cron_minute }}"
+    job: PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin /usr/local/sbin/trivy-critical-scan
