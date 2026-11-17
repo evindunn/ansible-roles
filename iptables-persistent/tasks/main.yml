@@ -26,18 +26,18 @@
     src: rules.v4.j2
     dest: /etc/iptables/rules.v4
     mode: '0644'
-  notify: Reload netfilter-persistent
+  notify: Restart netfilter-persistent
 
 - name: Render IPv6 iptables rules
   ansible.builtin.template:
     src: rules.v6.j2
     dest: /etc/iptables/rules.v6
     mode: '0644'
-  notify: Reload netfilter-persistent
+  notify: Restart netfilter-persistent
 
 - name: Force restart netfilter-persistent
   debug:
     msg: "netfilter-persistent will be restarted"
   when: iptables_persistent_force_restart | bool
   changed_when: True
-  notify: Reload netfilter-persistent
+  notify: Restart netfilter-persistent
