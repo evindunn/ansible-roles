@@ -1,0 +1,44 @@
+---
+
+- name: Validate the sudoers list
+  ansible.builtin.assert:
+    that:
+      - sudoers | type_debug == 'list'
+    fail_msg: sudoers must be a list of local usernames.
+
+- name: Validate sudoers usernames
+  ansible.builtin.assert:
+    that:
+      - item is string
+      - item is match('^[A-Za-z_][A-Za-z0-9_-]*[$]?$')
+    fail_msg: Each sudoers entry must be a literal local username.
+  loop: "{{ sudoers }}"
+
+- name: Install sudo
+  ansible.builtin.package:
+    name: sudo
+    state: present
+
+- name: Create sudoers users
+  ansible.builtin.user:
+    name: "{{ item }}"
+    state: present
+    create_home: true
+  loop: "{{ sudoers | unique | sort }}"
+
+- name: Create the sudoers configuration directory
+  ansible.builtin.file:
+    path: /etc/sudoers.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0750'
+
+- name: Configure passwordless sudo for listed users
+  ansible.builtin.template:
+    src: users.j2
+    dest: /etc/sudoers.d/99-ansible-users
+    owner: root
+    group: root
+    mode: '0440'
+    validate: /usr/sbin/visudo -cf %s

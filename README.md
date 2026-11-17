@@ -29,6 +29,7 @@ Collection of ansible roles that I've written for the homelab
 | [postgres-server](postgres-server/) | Installs the PostgreSQL server package for a selected major version. |
 | [reboot](reboot/) | Provides a simple reboot task for roles that notify or include host restarts. |
 | [samba-server](samba-server/) | Installs and starts Samba, with an optional Samba exporter on amd64 hosts. |
+| [sudoers](sudoers/) | Creates local users and grants them passwordless sudo for all commands. |
 | [trivy](trivy/) | Installs Trivy from the official Aqua Security apt repository and a mailx provider on Debian and Ubuntu. |
 | [trusted-certs](trusted-certs/) | Installs additional trusted certificate authorities and refreshes the system trust store. |
 | [unattended-upgrades](unattended-upgrades/) | Configures unattended package updates for Debian and RedHat families. |
