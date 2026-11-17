@@ -1,0 +1,9 @@
+---
+
+_needsrestart_service_lists: >-
+  {{ [needsrestart_ignore_services] +
+     query('ansible.builtin.vars',
+           *(query('ansible.builtin.varnames', '^needsrestart_ignore_services__.+$') | sort)) }}
+
+_needsrestart_effective_ignore_services: >-
+  {{ _needsrestart_service_lists | flatten(levels=1, skip_nulls=false) }}

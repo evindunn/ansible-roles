@@ -2,7 +2,7 @@
 
 Installs NGINX after applying operating-system-specific repository setup.
 
-On Debian-family systems, configures NEEDRESTART to skip automatic NGINX restarts.
+Configure automatic restart exclusions with the [needsrestart role](../needsrestart/README.md).
 
 ## Example
 

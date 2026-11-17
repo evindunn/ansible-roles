@@ -1,5 +1,8 @@
 ---
 
+needsrestart_ignore_services__iptables_persistent:
+  - netfilter-persistent
+
 iptables_persistent_rules: []
 
 iptables_persistent_ipv4_rules: "{{ iptables_persistent_rules }}"

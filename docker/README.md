@@ -2,7 +2,7 @@
 
 Installs pinned Docker packages, configures the daemon, and prevents package upgrades.
 
-On Debian-family systems, configures NEEDRESTART to skip automatic Docker restarts.
+Configure automatic restart exclusions with the [needsrestart role](../needsrestart/README.md).
 
 ## Example
 

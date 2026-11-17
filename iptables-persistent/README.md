@@ -2,6 +2,10 @@
 
 Installs `iptables-persistent` and renders persistent IPv4 and IPv6 rules.
 
+Contributes `netfilter-persistent` to the [needsrestart role](../needsrestart/README.md)
+through `needsrestart_ignore_services__iptables_persistent`. Run `needsrestart`
+before package changes. Set the contribution to `[]` to allow automatic restarts.
+
 ## Defaults
 
 ```yml

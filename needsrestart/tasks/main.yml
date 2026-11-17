@@ -1,0 +1,41 @@
+---
+
+- name: Validate NEEDRESTART service lists
+  ansible.builtin.assert:
+    that:
+      - item | type_debug == 'list'
+    fail_msg: NEEDRESTART exclusions and each contribution must be lists of literal service names.
+  loop: "{{ _needsrestart_service_lists }}"
+
+- name: Validate NEEDRESTART service names
+  ansible.builtin.assert:
+    that:
+      - item is string
+      - item is match('^[A-Za-z0-9_@.+:-]+$')
+    fail_msg: Service names must contain only letters, numbers, underscores, @, dots, plus signs, colons, or hyphens.
+  loop: "{{ _needsrestart_effective_ignore_services }}"
+
+- name: Create NEEDRESTART configuration directory
+  ansible.builtin.file:
+    path: /etc/needrestart/conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Configure services excluded from NEEDRESTART automatic restarts
+  ansible.builtin.template:
+    src: ignored-services.conf.j2
+    dest: /etc/needrestart/conf.d/ansible-ignored-services.conf
+    owner: root
+    group: root
+    mode: '0644'
+    validate: /usr/bin/perl -c %s
+
+- name: Remove exclusions previously managed by the Docker and Nginx roles
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/needrestart/conf.d/docker.conf
+    - /etc/needrestart/conf.d/nginx.conf

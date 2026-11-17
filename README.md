@@ -20,6 +20,7 @@ Collection of ansible roles that I've written for the homelab
 | [iptables-persistent](iptables-persistent/) | Installs `iptables-persistent` and renders persistent IPv4 and IPv6 rules. |
 | [k8s_node](k8s_node/) | Installs Kubernetes node packages from the upstream apt repository and disables swap. |
 | [locale](locale/) | Installs locale support and configures the system locale and keyboard layout. |
+| [needsrestart](needsrestart/) | Configures services that NEEDRESTART must exclude from automatic restarts. |
 | [nginx](nginx/) | Installs NGINX after applying operating-system-specific repository setup. |
 | [node_exporter](node_exporter/) | Installs Prometheus node_exporter from GitHub releases and manages its systemd service. |
 | [ntp-client](ntp-client/) | Configures OS-specific time synchronization and the system timezone. |

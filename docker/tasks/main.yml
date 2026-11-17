@@ -3,26 +3,6 @@
 - name: include os-specific variables
   include_vars: "{{ ansible_facts['os_family'] }}.yml"
 
-- name: Configure NEEDRESTART to skip Docker restarts
-  when: ansible_facts['os_family'] == 'Debian'
-  block:
-    - name: Create NEEDRESTART configuration directory
-      ansible.builtin.file:
-        path: /etc/needrestart/conf.d
-        state: directory
-        owner: root
-        group: root
-        mode: '0755'
-
-    - name: Disable Docker restarts in NEEDRESTART
-      ansible.builtin.copy:
-        dest: /etc/needrestart/conf.d/docker.conf
-        content: |
-          $nrconf{override_rc}->{qr(^docker(\.service)?$)} = 0;
-        owner: root
-        group: root
-        mode: '0644'
-
 - name: install dependencies
   package:
     name: "{{ docker_deps }}"

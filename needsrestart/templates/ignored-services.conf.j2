@@ -1,0 +1,12 @@
+# {{ ansible_managed }}
+# Keep service names literal, including dots and instance names.
+{% if _needsrestart_effective_ignore_services | length %}
+foreach my $service (
+{% for service in _needsrestart_effective_ignore_services | map('regex_replace', '\.service$', '') | unique | sort %}
+    '{{ service }}',
+{% endfor %}
+) {
+    $nrconf{override_rc}->{qr/^\Q$service\E(?:\.service)?$/} = 0;
+}
+{% endif %}
+1;
