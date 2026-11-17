@@ -1,0 +1,9 @@
+---
+
+_crowdsec_parser_lists: >-
+  {{ [crowdsec_parsers] +
+     query('ansible.builtin.vars',
+           *(query('ansible.builtin.varnames', '^crowdsec_parsers__.+$') | sort)) }}
+
+_crowdsec_effective_parsers: >-
+  {{ _crowdsec_parser_lists | flatten(levels=1, skip_nulls=false) }}

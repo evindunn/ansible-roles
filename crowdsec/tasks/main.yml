@@ -1,5 +1,20 @@
 ---
 
+- name: Validate CrowdSec parser lists
+  ansible.builtin.assert:
+    that:
+      - item | type_debug == 'list'
+    fail_msg: crowdsec_parsers and each parser contribution must be lists.
+  loop: "{{ _crowdsec_parser_lists }}"
+
+- name: Validate CrowdSec parser names
+  ansible.builtin.assert:
+    that:
+      - item is string
+      - item | length > 0
+    fail_msg: CrowdSec parser names must be non-empty strings.
+  loop: "{{ _crowdsec_effective_parsers }}"
+
 - name: Download the CrowdSec install script
   ansible.builtin.get_url:
     url: https://install.crowdsec.net
@@ -36,7 +51,12 @@
     - crowdsec-firewall-bouncer
 
 - name: Install CrowdSec parsers
-  ansible.builtin.shell: "cscli parsers install {{ item }} 2>&1"
+  ansible.builtin.command:
+    argv:
+      - cscli
+      - parsers
+      - install
+      - "{{ item }}"
   register: crowdsec_parser_install
-  changed_when: "'Nothing to install' not in crowdsec_parser_install.stdout"
-  loop: "{{ crowdsec_parsers }}"
+  changed_when: "'Nothing to install' not in (crowdsec_parser_install.stdout ~ crowdsec_parser_install.stderr)"
+  loop: "{{ _crowdsec_effective_parsers | unique | sort }}"
