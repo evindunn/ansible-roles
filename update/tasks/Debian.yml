@@ -4,4 +4,4 @@
   apt:
     upgrade: safe
     autoremove: yes
-    cache_valid_time: 3600
+    update_cache: true

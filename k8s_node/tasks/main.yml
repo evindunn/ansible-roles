@@ -27,6 +27,7 @@
       - kubelet
       - kubeadm
       - kubectl
+    cache_valid_time: 3600
     update_cache: "{{ k8s_gpg_dl.changed or k8s_repo_file.changed }}"
 
 - when: ansible_facts["swaptotal_mb"] > 0

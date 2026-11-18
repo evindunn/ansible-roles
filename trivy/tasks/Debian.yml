@@ -37,6 +37,7 @@
 - name: Refresh the package cache when repository configuration changes
   ansible.builtin.apt:
     update_cache: true
+    cache_valid_time: 3600
   when: trivy_signing_key.changed or trivy_repository.changed
 
 - name: Install Trivy and mailx
@@ -45,3 +46,4 @@
       - trivy
       - "{{ trivy_mail_package }}"
     state: present
+    cache_valid_time: 3600

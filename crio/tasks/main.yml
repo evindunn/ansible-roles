@@ -52,6 +52,7 @@
   apt:
     name: cri-o
     state: latest
+    cache_valid_time: 3600
     update_cache: "{{ crio_gpg_dl.changed or crio_repo_file.changed }}"
 
 - name: Make sure cri-o is started/enabled

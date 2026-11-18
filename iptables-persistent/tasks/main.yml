@@ -11,9 +11,10 @@
     - iptables-persistent/autosave_v6
 
 - name: Make sure iptables-persistent is installed
-  ansible.builtin.package:
+  ansible.builtin.apt:
     name: iptables-persistent
     state: present
+    cache_valid_time: 3600
 
 - name: Create the iptables configuration directory
   ansible.builtin.file:
