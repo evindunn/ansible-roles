@@ -22,16 +22,43 @@
     state: directory
     mode: '0755'
 
-- name: Render IPv4 iptables rules
+- name: Create the netfilter-persistent service override directory
+  ansible.builtin.file:
+    path: /etc/systemd/system/netfilter-persistent.service.d
+    state: directory
+    mode: '0755'
+
+- name: Install the firewall apply script
   ansible.builtin.template:
-    src: rules.v4.j2
+    src: apply-rules.sh.j2
+    dest: /usr/local/sbin/apply-persistent-firewall
+    mode: '0755'
+    validate: /bin/sh -n %s
+  notify: Restart netfilter-persistent
+
+- name: Configure Docker-safe firewall persistence
+  ansible.builtin.template:
+    src: service-override.conf.j2
+    dest: /etc/systemd/system/netfilter-persistent.service.d/firewall.conf
+    mode: '0644'
+  notify: Restart netfilter-persistent
+
+- name: Render IPv4 iptables rules
+  vars:
+    firewall_policies: "{{ iptables_persistent_ipv4_default_policies }}"
+    firewall_rules: "{{ iptables_persistent_ipv4_rules }}"
+  ansible.builtin.template:
+    src: rules.j2
     dest: /etc/iptables/rules.v4
     mode: '0644'
   notify: Restart netfilter-persistent
 
 - name: Render IPv6 iptables rules
+  vars:
+    firewall_policies: "{{ iptables_persistent_ipv6_default_policies }}"
+    firewall_rules: "{{ iptables_persistent_ipv6_rules }}"
   ansible.builtin.template:
-    src: rules.v6.j2
+    src: rules.j2
     dest: /etc/iptables/rules.v6
     mode: '0644'
   notify: Restart netfilter-persistent

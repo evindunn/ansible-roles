@@ -1,0 +1,23 @@
+# {{ ansible_managed }}
+*filter
+{% for chain, policy in firewall_policies.items() %}
+{% if chain in ['INPUT', 'FORWARD', 'OUTPUT'] %}
+:ANSIBLE-{{ chain }} - [0:0]
+{% else %}
+:{{ chain }} - [0:0]
+{% endif %}
+{% endfor %}
+{% for rule in firewall_rules %}
+{% set parts = rule.split(' ', 2) %}
+{% if parts[0] == '-A' and parts[1] in ['INPUT', 'FORWARD', 'OUTPUT'] %}
+-A ANSIBLE-{{ parts[1] }} {{ parts[2] }}
+{% else %}
+{{ rule }}
+{% endif %}
+{% endfor %}
+{% for chain, policy in firewall_policies.items() %}
+{% if chain in ['INPUT', 'FORWARD', 'OUTPUT'] %}
+-A ANSIBLE-{{ chain }} -j {{ policy }}
+{% endif %}
+{% endfor %}
+COMMIT

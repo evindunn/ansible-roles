@@ -26,8 +26,25 @@ iptables_persistent_force_restart: false
 
 ## Rule Format
 
-Rules are defined as YAML lists of strings. Each item is rendered literally as
-one line in the `filter` table.
+Rules are defined as YAML lists of strings. Append rules for `INPUT`, `OUTPUT`,
+and `FORWARD` are redirected into role-owned `ANSIBLE-*` chains. The configured
+policy is the final verdict in each of those chains.
+
+The systemd override applies these files with `iptables-restore --noflush` and
+`ip6tables-restore --noflush`. Only declared custom chains are replaced. Existing
+Docker chains and built-in-chain rules are preserved. Hooks are inserted only
+when missing. On hosts that declare `DOCKER-USER`, Docker owns forwarding;
+the role does not hook its `ANSIBLE-FORWARD` chain into `FORWARD`.
+
+Only declare custom chains that this role owns, such as `DOCKER-USER`. Do not
+declare Docker's internal chains. Do not add direct built-in-chain rules with
+operations other than `-A`; these are not redirected into managed chains.
+
+Use `systemctl reload netfilter-persistent` to apply edits. The service override
+also applies the same rules at boot. Do not use `netfilter-persistent save` or
+the stock command-line `reload`: those bypass this service override. Existing
+legacy rules in built-in chains remain during migration; the new hooks take
+precedence. A reboot removes those legacy in-memory rules.
 
 ```yml
 iptables_persistent_rules:

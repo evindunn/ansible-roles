@@ -1,0 +1,21 @@
+#!/bin/sh
+# {{ ansible_managed }}
+set -eu
+
+{% for family, command, policies in [('v4', 'iptables', iptables_persistent_ipv4_default_policies), ('v6', 'ip6tables', iptables_persistent_ipv6_default_policies)] %}
+# Replace only the declared custom chains; preserve Docker's live rules.
+{{ command }}-restore --wait 10 --noflush --test < '/etc/iptables/rules.{{ family }}'
+{% endfor %}
+{% for family, command, policies in [('v4', 'iptables', iptables_persistent_ipv4_default_policies), ('v6', 'ip6tables', iptables_persistent_ipv6_default_policies)] %}
+{{ command }}-restore --wait 10 --noflush < '/etc/iptables/rules.{{ family }}'
+{% for chain, policy in policies.items() %}
+{% if chain in ['INPUT', 'FORWARD', 'OUTPUT'] %}
+{% if chain != 'FORWARD' or policies.get('DOCKER-USER') is none %}
+if ! {{ command }} --wait 10 -C '{{ chain }}' -j 'ANSIBLE-{{ chain }}'; then
+    {{ command }} --wait 10 -I '{{ chain }}' 1 -j 'ANSIBLE-{{ chain }}'
+fi
+{% endif %}
+{{ command }} --wait 10 -P '{{ chain }}' '{{ policy }}'
+{% endif %}
+{% endfor %}
+{% endfor %}
